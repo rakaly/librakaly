@@ -1,3 +1,5 @@
+![ci](https://github.com/rakaly/librakaly/workflows/ci/badge.svg)
+
 # LibRakaly
 
 librakaly is a shared library for [rakaly](https://rakaly.com/eu4) functionality that exposes a C interface and can be embedded in any application that can call C code.

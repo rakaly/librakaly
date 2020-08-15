@@ -50,5 +50,5 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       working-directory: ./target
       run: |
-        cp ../sample.h .
+        cp ../sample.c .
         gcc sample.c -o melter -O3 librakaly.so

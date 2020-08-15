@@ -1,0 +1,21 @@
+[package]
+name = "librakaly"
+version = "0.3.1-pre"
+authors = ["Nick Babcock <nbabcock19@hotmail.com>"]
+edition = "2018"
+repository = "https://github.com/rakaly/librakaly.git"
+description = "A C wrapper around rakaly functionality"
+readme = "README.md"
+license = "MIT"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+name = "rakaly"
+
+[dependencies]
+libc = "0.2"
+eu4save = "0.1"
+
+[build-dependencies]
+cbindgen = "0.14"

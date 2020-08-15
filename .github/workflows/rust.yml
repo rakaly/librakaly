@@ -51,4 +51,5 @@ jobs:
       working-directory: ./target
       run: |
         cp ../sample.c .
+        cp ./debug/librakaly.so .
         gcc sample.c -o melter -O3 librakaly.so

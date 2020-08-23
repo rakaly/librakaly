@@ -82,9 +82,9 @@ dependencies = [
 
 [[package]]
 name = "eu4save"
-version = "0.1.3"
+version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "71783c8321f76f7130393b9f2c8a2724943b636c10d805fc08eb45bfa1b06e2d"
+checksum = "02ca6933fafd4e8ee5b6a60f3975d97bb4be1b6e258fb0fa9f6237c9bec8ee82"
 dependencies = [
  "jomini",
  "serde",

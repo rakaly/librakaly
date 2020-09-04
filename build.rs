@@ -13,6 +13,7 @@ fn main() {
         .with_crate(crate_dir)
         .with_language(cbindgen::Language::C)
         .with_no_includes()
+        .with_include("stddef.h")
         .generate()
         .expect("Unable to generate bindings")
         .write_to_file(out_path);

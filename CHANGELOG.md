@@ -1,3 +1,39 @@
+## v0.4.0 - 2020-09-04
+
+This is a rewrite to the API so that one can properly deallocate the melted data that librakaly allocates. This is how the use the new API:
+
+```c
+MeltedBuffer *melt = rakaly_eu4_melt(buf_in, buf_in_len);
+if (rakaly_melt_error_code(melt)) {
+  rakaly_free_melt(melt);
+  return 1;
+}
+
+size_t melted_len = rakaly_melt_data_length(melt);
+size_t melted_str_len = melted_len + 1;
+char *melted_buf = malloc(melted_str_len);
+
+if (melted_buf == NULL) {
+  rakaly_free_melt(melt);
+  return 1;
+}
+
+size_t wrote_len = rakaly_melt_write_data(melt, melted_buf, melted_str_len);
+if (wrote_len < 0) {
+  free(melted_buf);
+  rakaly_free_melt(melt);
+  return 1;
+}
+
+rakaly_free_melt(melt);
+
+// now do whatever you want with melted_buf
+
+free(melted_buf);
+```
+
+eu4save is updated from 0.1.2 to 0.2.2. The only noticeable differences should be dates prior to 1000.1.1 will now have leading zeros removed, so the melted output will now correctly contain 1.1.1 instead of 0001.1.1
+
 ## v0.3.1 - 2020-08-15
 
 - First open source release

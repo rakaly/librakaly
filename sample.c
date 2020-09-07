@@ -40,8 +40,6 @@ long read_file(char const *path, char **buf) {
 }
 
 int melt(char *buf_in, size_t buf_in_len) {
-  char *out_buf;
-  size_t out_size;
   MeltedBuffer *melt = rakaly_eu4_melt(buf_in, buf_in_len);
   if (rakaly_melt_error_code(melt)) {
     rakaly_free_melt(melt);
@@ -60,7 +58,7 @@ int melt(char *buf_in, size_t buf_in_len) {
   }
 
   size_t wrote_len = rakaly_melt_write_data(melt, melted_buf, melted_str_len);
-  if (wrote_len < 0) {
+  if (wrote_len != melted_str_len) {
     free(melted_buf);
     rakaly_free_melt(melt);
     fprintf(stderr, "unable to write melted data\n");
@@ -69,7 +67,7 @@ int melt(char *buf_in, size_t buf_in_len) {
 
   rakaly_free_melt(melt);
 
-  if (fwrite(melted_buf, melted_len, 1, stdout) == -1) {
+  if (fwrite(melted_buf, melted_len, 1, stdout) != 1) {
     free(melted_buf);
     fprintf(stderr, "unable to write to stdout\n");
     return 1;

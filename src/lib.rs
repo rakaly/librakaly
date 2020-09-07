@@ -145,3 +145,52 @@ fn _rakaly_eu4_melt(data_ptr: *const c_char, data_len: size_t) -> MeltedBuffer {
         },
     }
 }
+
+/// Melts binary encoded CK3 data into normal plaintext data. The melted buffer, when written utf-8 encoded
+/// plaintext.
+///
+/// Parameters:
+///
+///  - data: Pointer to immutable data that represents the binary data. The data can be:
+///    - autosave save
+///    - ironman save
+///    - binary data
+///  - data_len: Length of the data indicated by the data pointer. It is undefined behavior if the
+///  given length does not match the actual length of the data
+///
+/// If an unknown token is encountered and rakaly doesn't know how to convert it to plaintext there
+/// are two possible outcomes:
+///
+///  - If the token is part of an object's key then key and value will not appear in the plaintext
+///  output
+///  - Else the object value (or array value) will be string of "__unknown_x0$z" where z is the
+///  hexadecimal representation of the unknown token.
+#[no_mangle]
+pub extern "C" fn rakaly_ck3_melt(data_ptr: *const c_char, data_len: size_t) -> *mut MeltedBuffer {
+    std::panic::catch_unwind(|| {
+        let buffer = _rakaly_ck3_melt(data_ptr, data_len);
+        Box::into_raw(Box::new(buffer))
+    })
+    .unwrap_or_else(|_| std::ptr::null_mut())
+}
+
+fn _rakaly_ck3_melt(data_ptr: *const c_char, data_len: size_t) -> MeltedBuffer {
+    use ck3save::{FailedResolveStrategy, Melter};
+    let dp = data_ptr as *const c_uchar;
+    let data = unsafe { std::slice::from_raw_parts(dp, data_len) };
+    let melter = Melter::new().with_on_failed_resolve(FailedResolveStrategy::Ignore);
+    match melter.melt(data) {
+        Ok(mut d) => {
+            // Push the null terminating for our C friends
+            d.push(b'\0');
+            MeltedBuffer {
+                buffer: d,
+                error: None,
+            }
+        }
+        Err(e) => MeltedBuffer {
+            buffer: Vec::new(),
+            error: Some(Box::new(e)),
+        },
+    }
+}

@@ -1,3 +1,9 @@
+## v0.5.0 - 2020-09-07
+
+- Melt CK3 autosaves, ironman, and binary data into utf-8 plaintext
+- Add c++ wrapper: `rakaly_wrapper.h`
+- The c header, `rakaly.h`, is now c++ compatible
+
 ## v0.4.0 - 2020-09-04
 
 This is a rewrite to the API so that one can properly deallocate the melted data that librakaly allocates. This is how the use the new API:

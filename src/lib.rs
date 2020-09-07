@@ -85,16 +85,14 @@ pub unsafe extern "C" fn rakaly_melt_write_data(
     length: size_t,
 ) -> size_t {
     if res.is_null() || buffer.is_null() {
-        let result = -1;
-        return result as size_t;
+        return 0 as size_t;
     }
 
     let res = &*res;
     let buffer: &mut [u8] = std::slice::from_raw_parts_mut(buffer as *mut u8, length as usize);
 
     if buffer.len() < res.buffer.len() {
-        let result = -1;
-        return result as size_t;
+        return 0 as size_t;
     }
 
     std::ptr::copy_nonoverlapping(res.buffer.as_ptr(), buffer.as_mut_ptr(), res.buffer.len());

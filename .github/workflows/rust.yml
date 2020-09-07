@@ -54,5 +54,5 @@ jobs:
         cp ../sample.cpp .
         cp ../rakaly_wrapper.h .
         cp ./debug/librakaly.so .
-        gcc sample.c -o melter -O3 librakaly.so
-        clang++ sample.cpp -std=c++17 librakaly.so
+        gcc sample.c -o melter -Werror -Wall -Wextra -O3 librakaly.so
+        clang++ sample.cpp -o meltercpp -Werror -Wall -Wextra -std=c++17 librakaly.so

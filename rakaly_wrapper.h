@@ -15,7 +15,7 @@ inline std::string meltFinish(MeltedBuffer *melt) {
                              std::to_string(result));
   }
 
-  int len = rakaly_melt_data_length(melt) + 1;
+  size_t len = rakaly_melt_data_length(melt) + 1;
   std::string str(len, ' ');
 
   if (rakaly_melt_write_data(melt, str.data(), len) != len) {

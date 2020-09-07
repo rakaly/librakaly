@@ -83,20 +83,22 @@ pub unsafe extern "C" fn rakaly_melt_write_data(
     res: *const MeltedBuffer,
     buffer: *mut c_char,
     length: size_t,
-) -> c_int {
+) -> size_t {
     if res.is_null() || buffer.is_null() {
-        return -1;
+        let result = -1;
+        return result as size_t;
     }
 
     let res = &*res;
     let buffer: &mut [u8] = std::slice::from_raw_parts_mut(buffer as *mut u8, length as usize);
 
     if buffer.len() < res.buffer.len() {
-        return -1;
+        let result = -1;
+        return result as size_t;
     }
 
     std::ptr::copy_nonoverlapping(res.buffer.as_ptr(), buffer.as_mut_ptr(), res.buffer.len());
-    res.buffer.len() as c_int
+    res.buffer.len() as size_t
 }
 
 /// Melts binary encoded ironman data into normal plaintext data that can be understood by EU4

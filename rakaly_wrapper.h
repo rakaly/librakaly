@@ -34,11 +34,9 @@ inline std::string meltEU4(const std::string &encrypted) {
   return meltFinish(rakaly_eu4_melt(encrypted.c_str(), encrypted.length()));
 }
 
-// inline std::string meltCK3(const std::string& encrypted)
-//{
-//	return meltFinish(rakaly_ck3_melt(encrypted.c_str(),
-//encrypted.length()));
-//}
+inline std::string meltCK3(const std::string& encrypted) {
+  return meltFinish(rakaly_ck3_melt(encrypted.c_str(), encrypted.length()));
+}
 
 } // namespace rakaly
 

@@ -31,6 +31,7 @@ To build:
 
 - Have the [rust toolchain installed](https://rustup.rs/)
 - Define an environment variable `EU4_IRONMAN_TOKENS` pointing to a file containing the ironman tokens. More info in the [eu4save repo](https://github.com/rakaly/eu4save#ironman).
+- Define an environment variable `CK3_IRONMAN_TOKENS` pointing to a file containing the ironman tokens. More info in the [ck3save repo](https://github.com/rakaly/ck3save#ironman).
 - Invoke
 
 ```

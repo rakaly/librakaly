@@ -6,6 +6,10 @@ fn main() {
         panic!("librakaly needs to be built with EU4_IRONMAN_TOKENS specified")
     }
 
+    if env::var("CK3_IRONMAN_TOKENS").is_err() && env::var("CI").is_err() {
+        panic!("librakaly needs to be built with CK3_IRONMAN_TOKENS specified")
+    }
+
     let crate_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
     let out_path = Path::new(&crate_dir).join("target").join("rakaly.h");
 

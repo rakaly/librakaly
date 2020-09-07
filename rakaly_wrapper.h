@@ -1,12 +1,9 @@
 #ifndef RAKALY_WRAPPER_H
 #define RAKALY_WRAPPER_H
 
+#include "rakaly.h"
 #include <stdexcept>
 #include <string>
-
-extern "C" {
-#include "rakaly.h"
-}
 
 namespace rakaly {
 
@@ -34,7 +31,7 @@ inline std::string meltEU4(const std::string &encrypted) {
   return meltFinish(rakaly_eu4_melt(encrypted.c_str(), encrypted.length()));
 }
 
-inline std::string meltCK3(const std::string& encrypted) {
+inline std::string meltCK3(const std::string &encrypted) {
   return meltFinish(rakaly_ck3_melt(encrypted.c_str(), encrypted.length()));
 }
 

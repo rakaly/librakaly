@@ -17,7 +17,7 @@ std::string readFile(fs::path path) {
 
 int main(int argc, const char *argv[]) {
   if (argc != 2) {
-    fprintf(stderr, "expected one ironman file argument\n");
+    std::cerr << "expected one ironman file argument\n";
     return 1;
   }
   std::string input = readFile(argv[1]);

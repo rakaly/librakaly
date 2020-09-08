@@ -58,9 +58,9 @@ pub unsafe extern "C" fn rakaly_melt_data_length(res: *const MeltedBuffer) -> si
 ///
 /// Returns the number of bytes copied from the melted data to the provided buffer.
 ///
-/// If the buffer is not long enough for the melted data, then -1 is returned.
+/// If the buffer is not long enough for the melted data, then 0 is returned.
 ///
-/// If the melted data or provided buffer are null, then -1 is returned.
+/// If the melted data or provided buffer are null, then 0 is returned.
 ///
 /// # Safety
 ///

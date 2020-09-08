@@ -48,8 +48,10 @@ int melt(char *buf_in, size_t buf_in_len) {
   }
 
   size_t melted_len = rakaly_melt_data_length(melt);
-  size_t melted_str_len = melted_len + 1;
-  char *melted_buf = malloc(melted_str_len);
+
+  // Create buffer to store plaintext + 1 additional character to guarantee
+  // null termination in case we need that behavior in the future.
+  char *melted_buf = calloc(melted_len + 1, sizeof(char));
 
   if (melted_buf == NULL) {
     rakaly_free_melt(melt);
@@ -57,8 +59,8 @@ int melt(char *buf_in, size_t buf_in_len) {
     return 1;
   }
 
-  size_t wrote_len = rakaly_melt_write_data(melt, melted_buf, melted_str_len);
-  if (wrote_len != melted_str_len) {
+  size_t wrote_len = rakaly_melt_write_data(melt, melted_buf, melted_len);
+  if (wrote_len != melted_len) {
     free(melted_buf);
     rakaly_free_melt(melt);
     fprintf(stderr, "unable to write melted data\n");

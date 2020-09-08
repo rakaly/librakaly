@@ -40,9 +40,7 @@ pub unsafe extern "C" fn rakaly_free_melt(res: *mut MeltedBuffer) {
     }
 }
 
-/// Returns the length of the melted data in bytes. Length excludes null terminator if present,
-/// so make sure you add 1 to this result to ensure a buffer big enough to hold the data is
-/// allocated
+/// Returns the length of the melted data in bytes.
 ///
 /// # Safety
 ///
@@ -53,17 +51,7 @@ pub unsafe extern "C" fn rakaly_melt_data_length(res: *const MeltedBuffer) -> si
         return 0;
     }
 
-    let melted = &*res;
-
-    // Since `strlen` does not include null terminator in length calculation, neither will we.
-    // And if there isn't an error, we know that the melted data will end with a null terminator
-    // (as we're the ones that added it)
-    if melted.error.is_some() {
-        0 as size_t
-    } else {
-        // but as a sanity check, we'll make sure we can't underflow
-        std::cmp::max(melted.buffer.len(), 1) - 1 as size_t
-    }
+    (&*res).buffer.len()
 }
 
 /// Writes the melted data into a provided buffer that is a given length.
@@ -85,18 +73,18 @@ pub unsafe extern "C" fn rakaly_melt_write_data(
     length: size_t,
 ) -> size_t {
     if res.is_null() || buffer.is_null() {
-        return 0 as size_t;
+        return 0;
     }
 
     let res = &*res;
     let buffer: &mut [u8] = std::slice::from_raw_parts_mut(buffer as *mut u8, length as usize);
 
     if buffer.len() < res.buffer.len() {
-        return 0 as size_t;
+        return 0;
     }
 
     std::ptr::copy_nonoverlapping(res.buffer.as_ptr(), buffer.as_mut_ptr(), res.buffer.len());
-    res.buffer.len() as size_t
+    res.buffer.len()
 }
 
 /// Melts binary encoded ironman data into normal plaintext data that can be understood by EU4
@@ -130,20 +118,15 @@ pub extern "C" fn rakaly_eu4_melt(data_ptr: *const c_char, data_len: size_t) -> 
 fn _rakaly_eu4_melt(data_ptr: *const c_char, data_len: size_t) -> MeltedBuffer {
     let dp = data_ptr as *const c_uchar;
     let data = unsafe { std::slice::from_raw_parts(dp, data_len) };
-    match eu4save::melt(&data, eu4save::FailedResolveStrategy::Ignore) {
-        Ok(mut d) => {
-            // Push the null terminating for our C friends
-            d.push(b'\0');
-            MeltedBuffer {
-                buffer: d,
-                error: None,
-            }
-        }
-        Err(e) => MeltedBuffer {
+    eu4save::melt(&data, eu4save::FailedResolveStrategy::Ignore)
+        .map(|buffer| MeltedBuffer {
+            buffer,
+            error: None,
+        })
+        .unwrap_or_else(|e| MeltedBuffer {
             buffer: Vec::new(),
             error: Some(Box::new(e)),
-        },
-    }
+        })
 }
 
 /// Melts binary encoded CK3 data into normal plaintext data. The melted buffer, when written utf-8 encoded
@@ -178,19 +161,15 @@ fn _rakaly_ck3_melt(data_ptr: *const c_char, data_len: size_t) -> MeltedBuffer {
     use ck3save::{FailedResolveStrategy, Melter};
     let dp = data_ptr as *const c_uchar;
     let data = unsafe { std::slice::from_raw_parts(dp, data_len) };
-    let melter = Melter::new().with_on_failed_resolve(FailedResolveStrategy::Ignore);
-    match melter.melt(data) {
-        Ok(mut d) => {
-            // Push the null terminating for our C friends
-            d.push(b'\0');
-            MeltedBuffer {
-                buffer: d,
-                error: None,
-            }
-        }
-        Err(e) => MeltedBuffer {
+    Melter::new()
+        .with_on_failed_resolve(FailedResolveStrategy::Ignore)
+        .melt(data)
+        .map(|buffer| MeltedBuffer {
+            buffer,
+            error: None,
+        })
+        .unwrap_or_else(|e| MeltedBuffer {
             buffer: Vec::new(),
             error: Some(Box::new(e)),
-        },
-    }
+        })
 }

@@ -1,3 +1,10 @@
+## v0.6.0 - 2020-09-08
+
+A couple of small, but nevertheless breaking changes:
+
+- `rakaly_melt_write_data` now returns a `size_t` to indicate how many bytes were written. If the given melted buffer is null or if the given length isn't long enough to write into, then a 0 instead of -1 is returned.
+- `rakaly_melt_write_data` no longer writes a trailing null terminator into the buffer
+
 ## v0.5.0 - 2020-09-07
 
 - Melt CK3 autosaves, ironman, and binary data into utf-8 plaintext

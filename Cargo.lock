@@ -64,9 +64,9 @@ checksum = "4785bdd1c96b2a846b2bd7cc02e86b6b3dbf14e7e53446c4f54c92a361040822"
 
 [[package]]
 name = "ck3save"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1faa1b58dba4d4f8ce3c15ba2ea89bdba26dae69ba99b7307b2c767012dea555"
+checksum = "aca0d3440029abfcea397eff9260c3efa9f52f4aed8e592142279abd0b94bee8"
 dependencies = [
  "jomini",
  "once_cell",
@@ -101,9 +101,9 @@ dependencies = [
 
 [[package]]
 name = "eu4save"
-version = "0.2.3"
+version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ab4ec41d607d80c6b39cfc98cc4fe0b011b21a02fcdf34edb3684c9133c4073b"
+checksum = "37894823543f8da20ba32caffa878ca107b8a1b6d315a23321601a02bd11c4bc"
 dependencies = [
  "jomini",
  "once_cell",
@@ -160,9 +160,9 @@ checksum = "dc6f3ad7b9d11a0c00842ff8de1b60ee58661048eb8049ed33c73594f359d7e6"
 
 [[package]]
 name = "jomini"
-version = "0.4.2"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d5f39e7bbd76fb0bcef301fc8a33934fb432e4afbdbafefdb531e3772fc72ed1"
+checksum = "d435672892e81fc07fd6d50786f9808190ad3e38832f88e44e0028b4dc3113bf"
 dependencies = [
  "jomini_derive",
  "serde",

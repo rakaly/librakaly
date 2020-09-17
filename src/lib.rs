@@ -51,7 +51,7 @@ pub unsafe extern "C" fn rakaly_melt_data_length(res: *const MeltedBuffer) -> si
         return 0;
     }
 
-    (&*res).buffer.len()
+    (*res).buffer.len()
 }
 
 /// Writes the melted data into a provided buffer that is a given length.

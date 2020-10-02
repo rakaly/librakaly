@@ -66,10 +66,12 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       working-directory: ./verifier
       run: |
+        set -eou
         curl 'https://api.github.com/repos/rakaly/librakaly/releases/latest' | jq '.assets[].browser_download_url' | xargs -n1 curl -O -L
         cargo build --release
         LD_LIBRARY_PATH=. cargo run --release -- --game eu4 > /dev/null
         LD_LIBRARY_PATH=. cargo run --release -- --game ck3 > /dev/null
+        LD_LIBRARY_PATH=. cargo run --release -- --game imperator > /dev/null
     - name: Previous release uploaded correctly (Windows)
       if: matrix.os == 'windows-latest'
       working-directory: ./verifier
@@ -83,3 +85,4 @@ jobs:
         cargo build --release
         cargo run --release -- --game eu4 | Out-Null
         cargo run --release -- --game ck3 | Out-Null
+        cargo run --release -- --game imperator | Out-Null

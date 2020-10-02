@@ -29,6 +29,7 @@ extern "C" {
     fn rakaly_melt_write_data(res: *const MeltedBuffer, buffer: *mut c_char, length: size_t);
     fn rakaly_eu4_melt(data_ptr: *const c_char, data_len: size_t) -> *mut MeltedBuffer;
     fn rakaly_ck3_melt(data_ptr: *const c_char, data_len: size_t) -> *mut MeltedBuffer;
+    fn rakaly_imperator_melt(data_ptr: *const c_char, data_len: size_t) -> *mut MeltedBuffer;
 }
 
 fn main() {
@@ -57,6 +58,22 @@ fn main() {
                 let melted = rakaly_ck3_melt(data.as_ptr() as *const i8, data.len());
                 if rakaly_melt_error_code(melted) != 0 {
                     panic!("ck3 melt failed");
+                }
+
+                let out_len = rakaly_melt_data_length(melted);
+                let mut out: Vec<u8> = vec![0; out_len];
+                let _wrote_len =
+                    rakaly_melt_write_data(melted, out.as_mut_ptr() as *mut i8, out.len());
+                let _ = std::io::stdout().write_all(out.as_slice());
+                rakaly_free_melt(melted);
+            }
+        }
+        "imperator" => {
+            let data = request("imperator-test-cases", "observer1.5.rome");
+            unsafe {
+                let melted = rakaly_imperator_melt(data.as_ptr() as *const i8, data.len());
+                if rakaly_melt_error_code(melted) != 0 {
+                    panic!("imperator melt failed");
                 }
 
                 let out_len = rakaly_melt_data_length(melted);

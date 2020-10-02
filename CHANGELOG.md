@@ -1,3 +1,8 @@
+## v0.7.0 - 2020-10-02
+
+* `rakaly_imperator_melt` added to melt imperator saves
+* CK3 saves now melt `levels = { 10 0=1 1=2 }` losslessly
+
 ## v0.6.0 - 2020-09-08
 
 A couple of small, but nevertheless breaking changes:

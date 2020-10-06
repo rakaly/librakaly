@@ -1,3 +1,18 @@
+## v0.7.1 - 2020-10-06
+
+Support parsing saves that contain empty containers:
+
+```
+history = {
+  {}
+  1689.10.2={
+    decision="abc123"
+  }
+}
+```
+
+It is known that this format can occur in EU4 but it could also occur in others.
+
 ## v0.7.0 - 2020-10-02
 
 * `rakaly_imperator_melt` added to melt imperator saves

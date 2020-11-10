@@ -100,9 +100,9 @@ dependencies = [
 
 [[package]]
 name = "eu4save"
-version = "0.3.2"
+version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ef722eb0d2c4be9ec0128f148ac691ce5dd7ce614b052657b7b8fde4837347d6"
+checksum = "abaf1bc211ef361ead94fdff4d2fa452d55c01525b07ca7a115468bab437b57e"
 dependencies = [
  "jomini",
  "once_cell",

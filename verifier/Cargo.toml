@@ -12,4 +12,4 @@ members = ["."]
 [dependencies]
 argh = "0.1.3"
 libc = "0.2"
-rust-s3 = "0.22"
+attohttpc = "0.16"

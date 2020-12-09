@@ -20,4 +20,4 @@ ck3save = "0.1"
 imperator-save = "0.1"
 
 [build-dependencies]
-cbindgen = "0.14"
+cbindgen = "0.15"

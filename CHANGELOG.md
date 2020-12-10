@@ -1,6 +1,10 @@
-## v0.7.3 - 2020-12-09
+## v0.7.4 - 2020-12-09
 
 Negative dates can now be melted into the equivalent plaintext
+
+## v0.7.3 - 2020-12-09
+
+Skipped release
 
 ## v0.7.2 - 2020-12-09
 

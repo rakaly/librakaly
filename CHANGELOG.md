@@ -1,3 +1,7 @@
+## v0.7.2 - 2020-12-09
+
+Negative dates can now be melted into the equivalent plaintext
+
 ## v0.7.1 - 2020-10-06
 
 Support parsing saves that contain empty containers:

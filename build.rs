@@ -2,15 +2,15 @@ use std::env;
 use std::path::Path;
 
 fn main() {
-    if env::var("EU4_IRONMAN_TOKENS").is_err() && env::var("CI").is_err() {
+    if env::var("EU4_IRONMAN_TOKENS").is_err() {
         panic!("librakaly needs to be built with EU4_IRONMAN_TOKENS specified")
     }
 
-    if env::var("CK3_IRONMAN_TOKENS").is_err() && env::var("CI").is_err() {
+    if env::var("CK3_IRONMAN_TOKENS").is_err() {
         panic!("librakaly needs to be built with CK3_IRONMAN_TOKENS specified")
     }
 
-    if env::var("IMPERATOR_TOKENS").is_err() && env::var("CI").is_err() {
+    if env::var("IMPERATOR_TOKENS").is_err() {
         panic!("librakaly needs to be built with IMPERATOR_TOKENS specified")
     }
 

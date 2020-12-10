@@ -1,3 +1,6 @@
 fn main() {
-    println!("cargo:rustc-link-search=native=.");
+    if cfg!(not(windows)) {
+        println!("cargo:rustc-link-lib=rakaly");
+    }
+    println!("cargo:rustc-link-search=.");
 }

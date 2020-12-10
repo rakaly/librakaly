@@ -1,9 +1,6 @@
 name: ci
 on:
-  pull_request:
   push:
-    branches:
-    - master
   schedule:
   - cron: '00 01 * * *'
 
@@ -12,29 +9,19 @@ jobs:
     name: test
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         build:
-        - stable
-        - beta
-        - nightly
+        - linux
         - macos
         - win-msvc
         include:
-        - build: stable
+        - build: linux
           os: ubuntu-latest
-          rust: stable
-        - build: beta
-          os: ubuntu-latest
-          rust: beta
-        - build: nightly
-          os: ubuntu-latest
-          rust: nightly
         - build: macos
           os: macos-latest
-          rust: stable
         - build: win-msvc
           os: windows-latest
-          rust: stable
     steps:
     - uses: actions/checkout@v2
     - name: Cache saves
@@ -42,47 +29,40 @@ jobs:
       with:
         path: verifier/assets/saves
         key: verifier/assets/saves
-    - uses: actions/checkout@v2
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: ${{ matrix.rust }}
-        profile: minimal
-        override: true
-
+    - name: Decrypt tokens
+      run: ./assets/ci/decrypt_secret.sh
+      env:
+        TOKEN_PASSPHRASE: ${{ secrets.TOKEN_PASSPHRASE }}
+    - name: Set cargo environment variables
+      shell: bash
+      run: |
+        echo "EU4_IRONMAN_TOKENS=$current_dir/assets/tokens/eu4.txt" >> $GITHUB_ENV
+        echo "CK3_IRONMAN_TOKENS=$current_dir/assets/tokens/ck3.txt" >> $GITHUB_ENV
+        echo "IMPERATOR_TOKENS=$current_dir/assets/tokens/imperator.txt" >> $GITHUB_ENV
+      env:
+        current_dir: ${{ github.workspace }}
     - name: Build
       run: cargo build --all --verbose
     - name: GCC can build
       if: matrix.os == 'ubuntu-latest'
       working-directory: ./target
       run: |
+        set -eou
         cp ../sample.c .
         cp ../sample.cpp .
         cp ../rakaly_wrapper.h .
         cp ./debug/librakaly.so .
         gcc sample.c -o melter -Werror -Wall -Wextra -O3 librakaly.so
         clang++ sample.cpp -o meltercpp -Werror -Wall -Wextra -std=c++17 librakaly.so
-    - name: Previous release uploaded correctly
-      if: matrix.os == 'ubuntu-latest'
+    - name: Run verifier
       working-directory: ./verifier
+      shell: bash
       run: |
         set -eou
-        curl 'https://api.github.com/repos/rakaly/librakaly/releases/latest' | jq '.assets[].browser_download_url' | xargs -n1 curl -O -L
+        cp -r ../target/debug/*rakaly* .
         cargo build --release
-        LD_LIBRARY_PATH=. cargo run --release -- --game eu4 > /dev/null
-        LD_LIBRARY_PATH=. cargo run --release -- --game ck3 > /dev/null
-        LD_LIBRARY_PATH=. cargo run --release -- --game imperator > /dev/null
-    - name: Previous release uploaded correctly (Windows)
-      if: matrix.os == 'windows-latest'
-      working-directory: ./verifier
-      run: |
-        Invoke-WebRequest -OutFile .\release.json -Uri 'https://api.github.com/repos/rakaly/librakaly/releases/latest'
-        jq -r '.assets[].browser_download_url' .\release.json | Out-File -FilePath .\urls.txt
-        foreach ($line in Get-Content .\urls.txt) {
-            Write-Host "$line"
-            Invoke-WebRequest -Uri $line -OutFile $(Split-Path -Path "$line" -Leaf)
-        }
-        cargo build --release
-        cargo run --release -- --game eu4 | Out-Null
-        cargo run --release -- --game ck3 | Out-Null
-        cargo run --release -- --game imperator | Out-Null
+        cargo run --release -- --game eu4 > /dev/null
+        cargo run --release -- --game ck3 > /dev/null
+        cargo run --release -- --game imperator > /dev/null
+      env:
+        LD_LIBRARY_PATH: '.'

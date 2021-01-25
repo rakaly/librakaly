@@ -65,6 +65,9 @@ jobs:
         current_dir: ${{ github.workspace }}
     - name: Build
       run: cargo build --release --verbose
+    - name: strip linux builds
+      if: matrix.build == 'linux'
+      run: strip ./target/release/librakaly.so
     - name: Upload librakaly.so
       uses: actions/upload-release-asset@v1
       if: matrix.build == 'linux'

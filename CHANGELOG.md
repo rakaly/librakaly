@@ -1,3 +1,7 @@
+## v0.7.5 - 2021-01-25
+
+Correctly melt seed properties as integers instead of dates
+
 ## v0.7.4 - 2020-12-09
 
 Negative dates can now be melted into the equivalent plaintext

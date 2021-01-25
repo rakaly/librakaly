@@ -15,9 +15,9 @@ name = "rakaly"
 
 [dependencies]
 libc = "0.2"
-eu4save = "0.3"
-ck3save = "0.1"
-imperator-save = "0.1"
+eu4save = "0.4"
+ck3save = "0.2"
+imperator-save = "0.2"
 
 [build-dependencies]
 cbindgen = "0.15"

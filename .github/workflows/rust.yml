@@ -31,6 +31,7 @@ jobs:
         key: verifier/assets/saves
     - name: Decrypt tokens
       run: ./assets/ci/decrypt_secret.sh
+      shell: bash
       env:
         TOKEN_PASSPHRASE: ${{ secrets.TOKEN_PASSPHRASE }}
     - name: Set cargo environment variables

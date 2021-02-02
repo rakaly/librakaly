@@ -1,3 +1,8 @@
+## v0.8.0 - 2021-02-02
+
+- Support for melting HOI4 saves
+- Updated CK3 tokens to latest patch (1.2)
+
 ## v0.7.5 - 2021-01-25
 
 Correctly melt seed properties as integers instead of dates

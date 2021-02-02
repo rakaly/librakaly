@@ -13,3 +13,4 @@ members = ["."]
 argh = "0.1.3"
 libc = "0.2"
 attohttpc = "0.16"
+zip = "0.5"

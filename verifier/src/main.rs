@@ -1,7 +1,7 @@
 use argh::FromArgs;
 use libc::{c_char, c_int, size_t};
 use std::fs;
-use std::io::Write;
+use std::io::{Write, Read, Cursor};
 use std::path::Path;
 
 fn default_game() -> String {
@@ -29,6 +29,7 @@ extern "C" {
     fn rakaly_eu4_melt(data_ptr: *const c_char, data_len: size_t) -> *mut MeltedBuffer;
     fn rakaly_ck3_melt(data_ptr: *const c_char, data_len: size_t) -> *mut MeltedBuffer;
     fn rakaly_imperator_melt(data_ptr: *const c_char, data_len: size_t) -> *mut MeltedBuffer;
+    fn rakaly_hoi4_melt(data_ptr: *const c_char, data_len: size_t) -> *mut MeltedBuffer;
 }
 
 fn main() {
@@ -71,6 +72,28 @@ fn main() {
             let data = request("imperator-test-cases", "observer1.5.rome");
             unsafe {
                 let melted = rakaly_imperator_melt(data.as_ptr() as *const i8, data.len());
+                if rakaly_melt_error_code(melted) != 0 {
+                    panic!("imperator melt failed");
+                }
+
+                let out_len = rakaly_melt_data_length(melted);
+                let mut out: Vec<u8> = vec![0; out_len];
+                let _wrote_len =
+                    rakaly_melt_write_data(melted, out.as_mut_ptr() as *mut i8, out.len());
+                let _ = std::io::stdout().write_all(out.as_slice());
+                rakaly_free_melt(melted);
+            }
+        }
+        "hoi4" => {
+            let data = request("hoi4saves-test-cases", "1.10-ironman.zip");
+            let reader = Cursor::new(&data[..]);
+            let mut zip = zip::ZipArchive::new(reader).unwrap();
+            let mut zip_file = zip.by_index(0).unwrap();
+            let mut buffer = Vec::with_capacity(0);
+            zip_file.read_to_end(&mut buffer).unwrap();
+
+            unsafe {
+                let melted = rakaly_hoi4_melt(buffer.as_ptr() as *const i8, buffer.len());
                 if rakaly_melt_error_code(melted) != 0 {
                     panic!("imperator melt failed");
                 }

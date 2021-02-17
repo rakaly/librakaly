@@ -1,3 +1,7 @@
+## v0.8.2 - 2021-02-17
+
+- Update Imperator tokens to support the 2.0 update
+
 ## v0.8.1 - 2021-02-05
 
 - Improved melting support. Won't quote values that aren't quoted in plaintext

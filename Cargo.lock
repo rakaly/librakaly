@@ -77,13 +77,12 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "ck3save"
-version = "0.2.2"
+version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eeb61cfd2de859ee12a6ddbe31620ab96b46d6dfd71218aaed1deddfa47784cb"
+checksum = "5d34166d4b5f19fea726a8050b3e7fca1ab9ebe360114a6b9a92d7eaa2dfb4db"
 dependencies = [
  "jomini",
  "serde",
- "twoway",
  "zip",
 ]
 
@@ -113,9 +112,9 @@ dependencies = [
 
 [[package]]
 name = "eu4save"
-version = "0.4.3"
+version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08b82e280fb71b5a776fcd61c698385ff3160f05e2e2183527b936e2471a6bcf"
+checksum = "01e58d2382680d7b308b91409cf25e7da1e81e5455e0c89de93be35fb64a73ab"
 dependencies = [
  "jomini",
  "once_cell",
@@ -172,9 +171,9 @@ dependencies = [
 
 [[package]]
 name = "hoi4save"
-version = "0.1.2"
+version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a25a3477f1b2271d97fd496fdda804631c4abaca198002ced9e74fd82d597c95"
+checksum = "4edf32f912e98c0e63b0058afdebc71d1066a176f2718e390373d709e286c1fd"
 dependencies = [
  "jomini",
  "serde",
@@ -182,13 +181,12 @@ dependencies = [
 
 [[package]]
 name = "imperator-save"
-version = "0.2.2"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "99c98b377fb355606e25c7a7fc92818a8172f880fb4a17eeec15f4ae96eca5f9"
+checksum = "49ac71e6105920a3a02f5788dcc57638895b5f1d233eee6d929653a06cc7ee32"
 dependencies = [
  "jomini",
  "serde",
- "twoway",
  "zip",
 ]
 
@@ -210,9 +208,9 @@ checksum = "dd25036021b0de88a0aff6b850051563c6516d0bf53f8638938edbb9de732736"
 
 [[package]]
 name = "jomini"
-version = "0.10.1"
+version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3160df32af40cc6412c75913d90c2885c80c2a4eca3b53425a4bf963095dda4a"
+checksum = "511f0174fb28d9b0d3d83ff72ac03f5079f03df8bb154b6e79857e8d81aa773e"
 dependencies = [
  "jomini_derive",
  "serde",
@@ -254,12 +252,6 @@ checksum = "51b9bbe6c47d51fc3e1a9b945965946b4c44142ab8792c50835a980d362c2710"
 dependencies = [
  "cfg-if 1.0.0",
 ]
-
-[[package]]
-name = "memchr"
-version = "2.3.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ee1c47aaa256ecabcaea351eae4a9b01ef39ed810004e298d2511ed284b1525"
 
 [[package]]
 name = "miniz_oxide"
@@ -463,22 +455,6 @@ checksum = "a31142970826733df8241ef35dc040ef98c679ab14d7c3e54d827099b3acecaa"
 dependencies = [
  "serde",
 ]
-
-[[package]]
-name = "twoway"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6b40075910de3a912adbd80b5d8bad6ad10a23eeb1f5bf9d4006839e899ba5bc"
-dependencies = [
- "memchr",
- "unchecked-index",
-]
-
-[[package]]
-name = "unchecked-index"
-version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eeba86d422ce181a719445e51872fa30f1f7413b62becb52e95ec91aa262d85c"
 
 [[package]]
 name = "unicode-segmentation"

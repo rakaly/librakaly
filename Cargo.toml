@@ -21,4 +21,4 @@ hoi4save = "0.1"
 imperator-save = "0.2"
 
 [build-dependencies]
-cbindgen = "0.18"
+cbindgen = "0.19"

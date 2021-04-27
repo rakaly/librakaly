@@ -1,3 +1,8 @@
+## v0.8.4 - 2021-04-27
+
+- Update melting logic 
+- Update tokens to support Eu4 Leviathan
+
 ## v0.8.3 - 2021-03-16
 
 - Update CK3 tokens to support the 1.3 update

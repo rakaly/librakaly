@@ -1,3 +1,8 @@
+## v0.8.5 - 2021-04-27
+
+- Update tokens to support EU4 1.31.1
+- Fix regression introduced in v0.8.4 where ck3 and imperator would melt all numbers as dates
+
 ## v0.8.4 - 2021-04-27
 
 - Update melting to more accurately decode 64 bit floats (in rare cases large positive numbers could be interpreted as negative)

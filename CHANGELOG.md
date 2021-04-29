@@ -1,4 +1,4 @@
-## v0.8.5 - 2021-04-27
+## v0.8.5 - 2021-04-29
 
 - Update tokens to support EU4 1.31.1
 - Fix regression introduced in v0.8.4 where ck3 and imperator would melt all numbers as dates

@@ -118,7 +118,9 @@ pub extern "C" fn rakaly_eu4_melt(data_ptr: *const c_char, data_len: size_t) -> 
 fn _rakaly_eu4_melt(data_ptr: *const c_char, data_len: size_t) -> MeltedBuffer {
     let dp = data_ptr as *const c_uchar;
     let data = unsafe { std::slice::from_raw_parts(dp, data_len) };
-    eu4save::melt(&data, eu4save::FailedResolveStrategy::Ignore)
+    eu4save::Melter::new()
+        .with_on_failed_resolve(eu4save::FailedResolveStrategy::Ignore)
+        .melt(data)
         .map(|(buffer, _tokens)| MeltedBuffer {
             buffer,
             error: None,

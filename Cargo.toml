@@ -15,7 +15,7 @@ name = "rakaly"
 
 [dependencies]
 libc = "0.2"
-eu4save = "0.4"
+eu4save = "0.5"
 ck3save = "0.2"
 hoi4save = "0.1"
 imperator-save = "0.2"

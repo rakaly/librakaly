@@ -1,3 +1,11 @@
+## v0.8.7 - 2021-05-18
+
+- Melted output now only uses newlines for line endings
+- eu4: correct number of decimal points are always used
+- eu4: fixed the possibility of melted ids being detected as dates
+- ck3: rewrite save header line with new metadata size
+- ck3: omit certain ironman fields (`ironman` and `ironman_manager`) from melted output
+
 ## v0.8.6 - 2021-05-03
 
 - Update tokens to support EU4 1.31.2

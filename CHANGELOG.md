@@ -1,3 +1,8 @@
+## v0.8.8 - 2021-05-28
+
+- Melt with tabs instead of spaces
+- Melted quoted values are now escaped as needed. A quoted value that contained quotes didn't has the inner quotes escaped, leading to output that could fail to parse.
+
 ## v0.8.7 - 2021-05-18
 
 - Melted output now only uses newlines for line endings

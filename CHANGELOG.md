@@ -1,3 +1,8 @@
+## v0.8.9 - 2021-05-29
+
+- Fix obscenely large CK3 melted output (introduced in v0.8.8) due to not accounting for hidden objects
+- Fix some array values not being properly indented
+
 ## v0.8.8 - 2021-05-28
 
 - Melt with tabs instead of spaces

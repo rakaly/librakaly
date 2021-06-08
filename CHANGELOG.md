@@ -1,3 +1,7 @@
+## v0.8.10 - 2021-06-08
+
+- EU4 dates prior to 5000 BC can now be melted properly and not cause an error (only an issue for EU4 mods)
+
 ## v0.8.9 - 2021-05-29
 
 - Fix obscenely large CK3 melted output (introduced in v0.8.8) due to not accounting for hidden objects

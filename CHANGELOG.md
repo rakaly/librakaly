@@ -1,3 +1,7 @@
+## v0.8.11 - 2021-07-04
+
+- Fix improper melted output when a name ended with a quote
+
 ## v0.8.10 - 2021-06-08
 
 - EU4 dates prior to 5000 BC can now be melted properly and not cause an error (only an issue for EU4 mods)

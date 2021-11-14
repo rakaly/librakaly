@@ -1,3 +1,7 @@
+## v0.8.12 - 2021-11-14
+
+- Update tokens to support new EU4 1.32 additions
+
 ## v0.8.11 - 2021-07-04
 
 - Fix improper melted output when a name ended with a quote

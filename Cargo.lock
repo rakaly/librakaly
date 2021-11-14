@@ -230,7 +230,7 @@ checksum = "fbe5e23404da5b4f555ef85ebed98fb4083e55a00c317800bc2a50ede9f3d219"
 
 [[package]]
 name = "librakaly"
-version = "0.8.12"
+version = "0.8.13-pre"
 dependencies = [
  "cbindgen",
  "ck3save",

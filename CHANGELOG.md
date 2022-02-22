@@ -1,3 +1,9 @@
+## v0.8.13 - 2022-02-22
+
+- Support EU4 1.33
+- Support CK3 1.5
+- Support HOI4 1.11
+
 ## v0.8.12 - 2021-11-14
 
 - Update tokens to support new EU4 1.32 additions

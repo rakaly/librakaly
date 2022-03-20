@@ -1,3 +1,7 @@
+## v0.8.14 - 2022-03-20
+
+- Update EU4 melted output to be compatible with loading the save from the in game menu by not containing a terminating newline
+
 ## v0.8.13 - 2022-02-22
 
 - Support EU4 1.33

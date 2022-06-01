@@ -73,9 +73,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "ck3save"
-version = "0.2.13"
+version = "0.2.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "db60b1a7e21883db5e5f213c7af974c4818e2ab326fb30657efa46c41c071f56"
+checksum = "876d28a590465b08847c2007d0afa18b93c7f26b5483181d005335cce3ead770"
 dependencies = [
  "jomini",
  "serde",
@@ -107,10 +107,20 @@ dependencies = [
 ]
 
 [[package]]
-name = "eu4save"
-version = "0.6.1"
+name = "crossbeam-utils"
+version = "0.8.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d29e79dee031bccfbf923e6cac3fb2366e8f5654210b598338684a174bf6146"
+checksum = "0bf124c720b7686e3c2663cf54062ab0f68a88af2fb6a030e87e30bf721fcb38"
+dependencies = [
+ "cfg-if",
+ "lazy_static",
+]
+
+[[package]]
+name = "eu4save"
+version = "0.6.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4f053e270bd3f24fd522b8fa50e2d03f844b7a89d70375369eeb10a1616951b3"
 dependencies = [
  "jomini",
  "once_cell",
@@ -175,9 +185,9 @@ dependencies = [
 
 [[package]]
 name = "imperator-save"
-version = "0.2.9"
+version = "0.2.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "49a4a4238f7d007de6a6465392fe6ab7948e7629ef49f95d2a5ef12cea3c6cf0"
+checksum = "e72d7e5db338f2f94624af8240976d2e3e4df14081ade844505c0e84771497db"
 dependencies = [
  "jomini",
  "serde",
@@ -211,9 +221,9 @@ checksum = "1aab8fc367588b89dcee83ab0fd66b72b50b72fa1904d7095045ace2b0c81c35"
 
 [[package]]
 name = "jomini"
-version = "0.18.0"
+version = "0.18.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ff6439822f3a8a45d0291ce7b3e247d60b49e03f8e4e4544a2acfa8931b03d66"
+checksum = "b5d6dba1f33081d1ed79d8cf45872ab0619a2729d9fe54f69fd672928ca957e1"
 dependencies = [
  "jomini_derive",
  "serde",
@@ -228,6 +238,12 @@ dependencies = [
  "quote",
  "syn",
 ]
+
+[[package]]
+name = "lazy_static"
+version = "1.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
@@ -386,26 +402,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "thiserror"
-version = "1.0.30"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "854babe52e4df1653706b98fcfc05843010039b406875930a70e4d9644e5c417"
-dependencies = [
- "thiserror-impl",
-]
-
-[[package]]
-name = "thiserror-impl"
-version = "1.0.30"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aa32fd3f627f367fe16f893e2597ae3c05020f8bba2666a4e6ea73d377e5714b"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
 name = "toml"
 version = "0.5.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -462,12 +458,12 @@ checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
 
 [[package]]
 name = "zip"
-version = "0.5.13"
+version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "93ab48844d61251bb3835145c521d88aa4031d7139e8485990f60ca911fa0815"
+checksum = "bf225bcf73bb52cbb496e70475c7bd7a3f769df699c0020f6c7bd9a96dcf0b8d"
 dependencies = [
  "byteorder",
  "crc32fast",
+ "crossbeam-utils",
  "flate2",
- "thiserror",
 ]

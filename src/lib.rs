@@ -118,11 +118,19 @@ pub extern "C" fn rakaly_eu4_melt(data_ptr: *const c_char, data_len: size_t) -> 
 fn _rakaly_eu4_melt(data_ptr: *const c_char, data_len: size_t) -> MeltedBuffer {
     let dp = data_ptr as *const c_uchar;
     let data = unsafe { std::slice::from_raw_parts(dp, data_len) };
-    eu4save::Melter::new()
-        .with_on_failed_resolve(eu4save::FailedResolveStrategy::Ignore)
-        .melt(data)
-        .map(|(buffer, _tokens)| MeltedBuffer {
-            buffer,
+    let mut zip_sink = Vec::new();
+    eu4save::Eu4File::from_slice(data)
+        .and_then(|file| file.parse(&mut zip_sink))
+        .and_then(|file| {
+            file.as_binary()
+                .expect("binary file") // todo: replace with error
+                .melter()
+                .on_failed_resolve(eu4save::FailedResolveStrategy::Ignore)
+                .verbatim(true)
+                .melt(&eu4save::EnvTokens)
+        })
+        .map(|melted| MeltedBuffer {
+            buffer: melted.into_data(),
             error: None,
         })
         .unwrap_or_else(|e| MeltedBuffer {
@@ -160,14 +168,21 @@ pub extern "C" fn rakaly_ck3_melt(data_ptr: *const c_char, data_len: size_t) -> 
 }
 
 fn _rakaly_ck3_melt(data_ptr: *const c_char, data_len: size_t) -> MeltedBuffer {
-    use ck3save::{FailedResolveStrategy, Melter};
     let dp = data_ptr as *const c_uchar;
     let data = unsafe { std::slice::from_raw_parts(dp, data_len) };
-    Melter::new()
-        .with_on_failed_resolve(FailedResolveStrategy::Ignore)
-        .melt(data)
-        .map(|(buffer, _tokens)| MeltedBuffer {
-            buffer,
+    let mut zip_sink = Vec::new();
+    ck3save::Ck3File::from_slice(data)
+        .and_then(|file| file.parse(&mut zip_sink))
+        .and_then(|file| {
+            file.as_binary()
+                .expect("binary file") // todo: replace with error
+                .melter()
+                .on_failed_resolve(ck3save::FailedResolveStrategy::Ignore)
+                .verbatim(true)
+                .melt(&ck3save::EnvTokens)
+        })
+        .map(|melted| MeltedBuffer {
+            buffer: melted.into_data(),
             error: None,
         })
         .unwrap_or_else(|e| MeltedBuffer {
@@ -207,14 +222,21 @@ pub extern "C" fn rakaly_imperator_melt(
 }
 
 fn _rakaly_imperator_melt(data_ptr: *const c_char, data_len: size_t) -> MeltedBuffer {
-    use imperator_save::{FailedResolveStrategy, Melter};
     let dp = data_ptr as *const c_uchar;
     let data = unsafe { std::slice::from_raw_parts(dp, data_len) };
-    Melter::new()
-        .with_on_failed_resolve(FailedResolveStrategy::Ignore)
-        .melt(data)
-        .map(|(buffer, _tokens)| MeltedBuffer {
-            buffer,
+    let mut zip_sink = Vec::new();
+    imperator_save::ImperatorFile::from_slice(data)
+        .and_then(|file| file.parse(&mut zip_sink))
+        .and_then(|file| {
+            file.as_binary()
+                .expect("binary file") // todo: replace with error
+                .melter()
+                .on_failed_resolve(imperator_save::FailedResolveStrategy::Ignore)
+                .verbatim(true)
+                .melt(&imperator_save::EnvTokens)
+        })
+        .map(|melted| MeltedBuffer {
+            buffer: melted.into_data(),
             error: None,
         })
         .unwrap_or_else(|e| MeltedBuffer {
@@ -240,10 +262,7 @@ fn _rakaly_imperator_melt(data_ptr: *const c_char, data_len: size_t) -> MeltedBu
 ///  - Else the object value (or array value) will be string of "__unknown_x0$z" where z is the
 ///  hexadecimal representation of the unknown token.
 #[no_mangle]
-pub extern "C" fn rakaly_hoi4_melt(
-    data_ptr: *const c_char,
-    data_len: size_t,
-) -> *mut MeltedBuffer {
+pub extern "C" fn rakaly_hoi4_melt(data_ptr: *const c_char, data_len: size_t) -> *mut MeltedBuffer {
     std::panic::catch_unwind(|| {
         let buffer = _rakaly_hoi4_melt(data_ptr, data_len);
         Box::into_raw(Box::new(buffer))
@@ -252,14 +271,20 @@ pub extern "C" fn rakaly_hoi4_melt(
 }
 
 fn _rakaly_hoi4_melt(data_ptr: *const c_char, data_len: size_t) -> MeltedBuffer {
-    use hoi4save::{FailedResolveStrategy, Melter};
     let dp = data_ptr as *const c_uchar;
     let data = unsafe { std::slice::from_raw_parts(dp, data_len) };
-    Melter::new()
-        .with_on_failed_resolve(FailedResolveStrategy::Ignore)
-        .melt(data)
-        .map(|(buffer, _tokens)| MeltedBuffer {
-            buffer,
+    hoi4save::Hoi4File::from_slice(data)
+        .and_then(|file| file.parse())
+        .and_then(|file| {
+            file.as_binary()
+                .expect("binary file") // todo: replace with error
+                .melter()
+                .on_failed_resolve(hoi4save::FailedResolveStrategy::Ignore)
+                .verbatim(true)
+                .melt(&hoi4save::EnvTokens)
+        })
+        .map(|melted| MeltedBuffer {
+            buffer: melted.into_data(),
             error: None,
         })
         .unwrap_or_else(|e| MeltedBuffer {

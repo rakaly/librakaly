@@ -15,10 +15,10 @@ name = "rakaly"
 
 [dependencies]
 libc = "0.2"
-eu4save = "0.6"
-ck3save = "0.2"
-hoi4save = "0.1"
-imperator-save = "0.2"
+eu4save = { version = "0.8", default-features = false, features = ["libdeflate"] }
+imperator-save = { version = "0.4", default-features = false, features = ["libdeflate"] }
+ck3save = { version = "0.4", default-features = false, features = ["libdeflate"] }
+hoi4save = "0.3"
 
 [build-dependencies]
 cbindgen = "0.20"

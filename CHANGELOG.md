@@ -1,3 +1,9 @@
+## v0.8.16 - 2022-09-12
+
+- Update to CK3 1.7 tokens
+- Update to EU4 1.34 tokens
+- Sizeable performance improvements for zipped save formats
+
 ## v0.8.15 - 2022-06-01
 
 - Support CK3 1.6

@@ -28,6 +28,7 @@ fn main() {
         .with_language(cbindgen::Language::C)
         .with_no_includes()
         .with_include("stddef.h")
+        .with_trailer(include_str!("./src/cpp_helper.h"))
         .generate()
         .expect("Unable to generate bindings")
         .write_to_file(out_path);

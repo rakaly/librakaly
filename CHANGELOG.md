@@ -1,3 +1,7 @@
+## v0.9.0 - 2022-11-05
+
+- Initial support for melting Vic3 saves
+
 ## v0.8.17 - 2022-09-18
 
 - Fix incorrect CK3 1.7 melted format for floats

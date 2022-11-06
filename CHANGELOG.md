@@ -1,3 +1,7 @@
+## v0.9.1 - 2022-11-06
+
+- Consolidate separate c++ helper functions into main header
+
 ## v0.9.0 - 2022-11-05
 
 - Initial support for melting Vic3 saves

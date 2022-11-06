@@ -1,7 +1,7 @@
+#ifdef __cplusplus
 #ifndef RAKALY_WRAPPER_H
 #define RAKALY_WRAPPER_H
 
-#include "rakaly.h"
 #include <stdexcept>
 #include <string>
 
@@ -50,3 +50,4 @@ inline std::string meltVic3(const std::string &encrypted) {
 } // namespace rakaly
 
 #endif
+#endif // __cplusplus

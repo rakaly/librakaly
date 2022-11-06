@@ -292,3 +292,52 @@ fn _rakaly_hoi4_melt(data_ptr: *const c_char, data_len: size_t) -> MeltedBuffer 
             error: Some(Box::new(e)),
         })
 }
+
+/// Melts binary encoded vic3 data into normal plaintext data. The melted buffer will contain utf-8 encoded
+/// text.
+///
+/// Parameters:
+///
+///  - data: Pointer to immutable data that represents the binary data
+///  - data_len: Length of the data indicated by the data pointer. It is undefined behavior if the
+///  given length does not match the actual length of the data
+///
+/// If an unknown token is encountered and rakaly doesn't know how to convert it to plaintext there
+/// are two possible outcomes:
+///
+///  - If the token is part of an object's key then key and value will not appear in the plaintext
+///  output
+///  - Else the object value (or array value) will be string of "__unknown_x0$z" where z is the
+///  hexadecimal representation of the unknown token.
+#[no_mangle]
+pub extern "C" fn rakaly_vic3_melt(data_ptr: *const c_char, data_len: size_t) -> *mut MeltedBuffer {
+    std::panic::catch_unwind(|| {
+        let buffer = _rakaly_vic3_melt(data_ptr, data_len);
+        Box::into_raw(Box::new(buffer))
+    })
+    .unwrap_or_else(|_| std::ptr::null_mut())
+}
+
+fn _rakaly_vic3_melt(data_ptr: *const c_char, data_len: size_t) -> MeltedBuffer {
+    let dp = data_ptr as *const c_uchar;
+    let data = unsafe { std::slice::from_raw_parts(dp, data_len) };
+    let mut zip_sink = Vec::new();
+    vic3save::Vic3File::from_slice(data)
+        .and_then(|file| file.parse(&mut zip_sink))
+        .and_then(|file| {
+            file.as_binary()
+                .expect("binary file") // todo: replace with error
+                .melter()
+                .on_failed_resolve(vic3save::FailedResolveStrategy::Ignore)
+                .verbatim(true)
+                .melt(&vic3save::EnvTokens)
+        })
+        .map(|melted| MeltedBuffer {
+            buffer: melted.into_data(),
+            error: None,
+        })
+        .unwrap_or_else(|e| MeltedBuffer {
+            buffer: Vec::new(),
+            error: Some(Box::new(e)),
+        })
+}

@@ -63,6 +63,7 @@ jobs:
         echo "CK3_IRONMAN_TOKENS=$current_dir/assets/tokens/ck3.txt" >> $GITHUB_ENV
         echo "IMPERATOR_TOKENS=$current_dir/assets/tokens/imperator.txt" >> $GITHUB_ENV
         echo "HOI4_IRONMAN_TOKENS=$current_dir/assets/tokens/hoi4.txt" >> $GITHUB_ENV
+        echo "VIC3_IRONMAN_TOKENS=$current_dir/assets/tokens/vic3.txt" >> $GITHUB_ENV
       env:
         current_dir: ${{ github.workspace }}
     - name: Build

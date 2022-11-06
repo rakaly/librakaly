@@ -3,6 +3,12 @@
 version = 3
 
 [[package]]
+name = "adler"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f26201604c87b1e01bd3d98f8d5d9a8fcbb815e8cedb41ffccbeb4bf593a35fe"
+
+[[package]]
 name = "ansi_term"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -73,9 +79,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "ck3save"
-version = "0.4.2"
+version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "67b739ef5ec5a2e12d4c115346c730e7c1f1bc5ca2f61a038f41e340c1169d07"
+checksum = "ed638d0b322079ee169d0c4d20db68d2a2f1137fb8755884749d97c335f66951"
 dependencies = [
  "jomini",
  "libdeflater",
@@ -120,9 +126,9 @@ dependencies = [
 
 [[package]]
 name = "eu4save"
-version = "0.8.1"
+version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3f42c5e451987c9b328872d889a38ff73cab6a0abe0559e9df896502f50bc712"
+checksum = "9efe8a2f7c342e13c074326cdad64b67892fbcbc21e2fac34802ff94a43db09a"
 dependencies = [
  "jomini",
  "libdeflater",
@@ -167,9 +173,9 @@ dependencies = [
 
 [[package]]
 name = "hoi4save"
-version = "0.3.1"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b0c927b1ebe832c56eeb6cde1f37645647416dee3e14070b90c417b8e7297433"
+checksum = "110351713431df4d395c31e1633aefbec285e51b867a554299c00875ea5eda58"
 dependencies = [
  "jomini",
  "serde",
@@ -178,9 +184,9 @@ dependencies = [
 
 [[package]]
 name = "imperator-save"
-version = "0.4.1"
+version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "048fd88867c07700297acd586f0abcfe190f9efc50c4a0754d505694135e354d"
+checksum = "5616e7a6f4ae6cdb77f5c5389b8d5d27b6330b36687ed76c98bf2e6a8f4c92b0"
 dependencies = [
  "jomini",
  "libdeflater",
@@ -216,9 +222,9 @@ checksum = "6c8af84674fe1f223a982c933a0ee1086ac4d4052aa0fb8060c12c6ad838e754"
 
 [[package]]
 name = "jomini"
-version = "0.19.1"
+version = "0.20.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "abcf56da419099ea8558927a5db96655db1d725d24517473367d4f03c877d9bf"
+checksum = "2e86d4b770f0ef605045a909617ffa9808e8e9ffa9a2d5457cc6d4df8c59b0d2"
 dependencies = [
  "jomini_derive",
  "serde",
@@ -243,18 +249,18 @@ checksum = "8371e4e5341c3a96db127eb2465ac681ced4c433e01dd0e938adbef26ba93ba5"
 
 [[package]]
 name = "libdeflate-sys"
-version = "0.10.0"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "43afa5b192ff058426ba20a4f35c290ef402478d6045ac934ac15aa947a3898d"
+checksum = "cb6784b6b84b67d71b4307963d456a9c7c29f9b47c658f533e598de369e34277"
 dependencies = [
  "cc",
 ]
 
 [[package]]
 name = "libdeflater"
-version = "0.10.0"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e656b7960ec49e864badc7ad1b810427a7ac8b78511a699ce5cdc3ead0b32e5b"
+checksum = "d8e285aa6a046fd338b2592c16bee148b2b00789138ed6b7bb56bb13d585050d"
 dependencies = [
  "libdeflate-sys",
 ]
@@ -269,6 +275,7 @@ dependencies = [
  "hoi4save",
  "imperator-save",
  "libc",
+ "vic3save",
 ]
 
 [[package]]
@@ -278,6 +285,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "abb12e687cfb44aa40f41fc3978ef76448f9b6038cad6aef4259d3c095a2382e"
 dependencies = [
  "cfg-if",
+]
+
+[[package]]
+name = "miniz_oxide"
+version = "0.6.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b275950c28b37e794e8c55d88aeb5e139d0ce23fdbbeda68f8d7174abdf9e8fa"
+dependencies = [
+ "adler",
 ]
 
 [[package]]
@@ -451,6 +467,18 @@ name = "vec_map"
 version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f1bddf1187be692e79c5ffeab891132dfb0f236ed36a43c7ed39f1165ee20191"
+
+[[package]]
+name = "vic3save"
+version = "0.1.0"
+source = "git+https://github.com/pdx-tools/pdx-tools#9d4ada7c0c541cfa8a331a0016cb8745719a79b3"
+dependencies = [
+ "jomini",
+ "miniz_oxide",
+ "serde",
+ "thiserror",
+ "zip",
+]
 
 [[package]]
 name = "winapi"

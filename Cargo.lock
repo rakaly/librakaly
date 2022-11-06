@@ -474,6 +474,7 @@ version = "0.1.0"
 source = "git+https://github.com/pdx-tools/pdx-tools#9d4ada7c0c541cfa8a331a0016cb8745719a79b3"
 dependencies = [
  "jomini",
+ "libdeflater",
  "miniz_oxide",
  "serde",
  "thiserror",

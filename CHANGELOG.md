@@ -1,3 +1,14 @@
+## v0.10.0 - 2022-11-09
+
+- Support converting compressed plaintext saves to uncompressed
+- Add `rakaly_melt_binary_unknown_tokens` to know if unknown binary tokens were encountered in the input
+- Add `rakaly_melt_is_verbatim` to know if no work was required to convert to uncompressed plaintext
+- Add `rakaly_melt_binary_translated` to know if the input required binary translation
+- Add `rakaly_melt_error_length` and `rakaly_melt_error_write_data` so one can show a human readable error messages
+
+The C++ wrapper has been updated to take advantage of these new C APIs and has
+been rewritten. Please see the README or `sample.cpp` to see new usage.
+
 ## v0.9.1 - 2022-11-06
 
 - Consolidate separate c++ helper functions into main header

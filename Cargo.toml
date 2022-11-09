@@ -16,8 +16,8 @@ name = "rakaly"
 [dependencies]
 libc = "0.2"
 eu4save = { version = "0.8", default-features = false, features = ["libdeflate"] }
-imperator-save = { version = "0.4", default-features = false, features = ["libdeflate"] }
-ck3save = { version = "0.4", default-features = false, features = ["libdeflate"] }
+imperator-save = { git = "https://github.com/rakaly/imperator-save.git", default-features = false, features = ["libdeflate"] }
+ck3save = { git = "https://github.com/rakaly/ck3save.git", default-features = false, features = ["libdeflate"] }
 hoi4save = "0.3"
 vic3save = { git = "https://github.com/pdx-tools/pdx-tools", features = ["libdeflate"]  }
 

@@ -2,7 +2,44 @@
 
 # LibRakaly
 
-librakaly is a shared library for [rakaly](https://rakaly.com/eu4) functionality that exposes a C interface and can be embedded in any application that can call C code.
+librakaly is a shared library for [PDX Tools](https://pdx.tools/eu4) functionality that exposes a C and C++ interface and can be embedded in any application that can call C or C++ code.
+
+Below is a whirlwind tour of the C++ API.
+
+```cpp
+namespace fs = std::filesystem;
+
+rakaly::MeltedOutput meltPath(fs::path filePath, const std::string &input) {
+  if (filePath.extension() == ".eu4") {
+    return rakaly::meltEu4(input);
+  } else if (filePath.extension() == ".ck3") {
+    return rakaly::meltCk3(input);
+  } else if (filePath.extension() == ".hoi4") {
+    return rakaly::meltHoi4(input);
+  } else if (filePath.extension() == ".rome") {
+    return rakaly::meltImperator(input);
+  } else if (filePath.extension() == ".v3") {
+    return rakaly::meltVic3(input);
+  } else {
+    throw std::runtime_error("unrecognized file extension");
+  }
+}
+
+int main(int argc, const char *argv[]) {
+  // ... snip getting file path and reading file ...
+  const auto melted = meltPath(filePath, input);
+  if (melted.was_binary()) {
+    std::cerr << "cool! This was converted from binary\n";
+    if (melted.has_unknown_tokens()) {
+      std::cerr << "but some fields could not be converted\n";
+      std::cerr << "and will look like '__unknown_0x' in the output\n";
+    }
+  }
+
+  melted.writeData(input);
+  std::cout << input;
+}
+```
 
 ## Tutorial
 
@@ -12,11 +49,11 @@ While these steps are linux specific, librakaly can also be used with ease on wi
 - [Go to the latest librakaly release](https://github.com/rakaly/librakaly/releases)
 - Download the librakaly.so
 - Download the rakaly.h
-- Download the sample C code from the repository
+- Download `sample.cpp` for the C++ example. If writing C, one can base their implementation off the C++ wrapper in `./src/cpp_helper.h`
 - Invoke gcc as follows
 
 ```
-gcc sample.c -o melter -O3 librakaly.so
+gcc sample.c -o melter -O2 librakaly.so
 ```
 
 - Then invoke the melter like:

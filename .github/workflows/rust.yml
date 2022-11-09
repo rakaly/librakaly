@@ -27,8 +27,8 @@ jobs:
     - name: Cache saves
       uses: actions/cache@v3
       with:
-        path: verifier/assets/saves
-        key: verifier/assets/saves
+        path: assets/saves
+        key: assets/saves
     - name: Decrypt tokens
       run: ./assets/ci/decrypt_secret.sh
       shell: bash
@@ -45,27 +45,41 @@ jobs:
       env:
         current_dir: ${{ github.workspace }}
     - name: Build
-      run: cargo build --all --verbose
-    - name: GCC can build
+      run: cargo build --all --verbose --release
+    - name: create save assets directory
+      shell: bash
+      run: mkdir -p assets/saves
+    - name: Retrieve assets
+      shell: bash
+      run: |
+        [ ! -f kandy2.bin.eu4 ] && curl -O https://eu4saves-test-cases.s3.us-west-002.backblazeb2.com/kandy2.bin.eu4 || true
+        [ ! -f af_Munso_867_Ironman.ck3 ] && curl -O https://ck3saves-test-cases.s3.us-west-002.backblazeb2.com/af_Munso_867_Ironman.ck3 || true
+        [ ! -f observer1.5.rome ] && curl -O https://imperator-test-cases.s3.us-west-002.backblazeb2.com/observer1.5.rome || true
+        [ ! -f 1.10-ironman.zip ] && curl -O https://hoi4saves-test-cases.s3.us-west-002.backblazeb2.com/1.10-ironman.zip && unzip 1.10-ironman.zip || true
+      working-directory: ./assets/saves
+    - name: Run verifier
       if: matrix.os == 'ubuntu-latest'
       working-directory: ./target
       run: |
         set -eou
-        cp ../sample.c .
         cp ../sample.cpp .
-        cp ./debug/librakaly.so .
-        gcc sample.c -o melter -Werror -Wall -Wextra -O3 librakaly.so
-        clang++ sample.cpp -o meltercpp -Werror -Wall -Wextra -std=c++17 librakaly.so
-    - name: Run verifier
-      working-directory: ./verifier
-      shell: bash
+        cp ./release/librakaly.so .
+
+        g++ sample.cpp -o melter -std=c++17 -Werror -Wall -Wextra -O2 librakaly.so
+        LD_LIBRARY_PATH=. ./melter ../assets/saves/kandy2.bin.eu4 > /dev/null
+        LD_LIBRARY_PATH=. ./melter ../assets/saves/af_Munso_867_Ironman.ck3 > /dev/null
+        LD_LIBRARY_PATH=. ./melter ../assets/saves/observer1.5.rome > /dev/null
+        LD_LIBRARY_PATH=. ./melter ../assets/saves/1.10-ironman.hoi4 > /dev/null
+    - uses: ilammy/msvc-dev-cmd@v1
+    - name: Run verifier (windows)
+      if: matrix.os == 'windows-latest'
+      working-directory: ./target
       run: |
-        set -eou
-        cp -r ../target/debug/*rakaly* .
-        cargo build --release
-        cargo run --release -- --game eu4 > /dev/null
-        cargo run --release -- --game ck3 > /dev/null
-        cargo run --release -- --game imperator > /dev/null
-        cargo run --release -- --game hoi4 > /dev/null
-      env:
-        LD_LIBRARY_PATH: '.'
+        cp ..\sample.cpp .
+        cp .\release\rakaly* .
+
+        cl /EHsc sample.cpp /std:c++17 /link rakaly.dll.lib /out:melter.exe
+        .\melter.exe ..\assets\saves\kandy2.bin.eu4
+        .\melter.exe ..\assets\saves\af_Munso_867_Ironman.ck3
+        .\melter.exe ..\assets\saves\observer1.5.rome
+        .\melter.exe ..\assets\saves\1.10-ironman.hoi4

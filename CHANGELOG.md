@@ -1,3 +1,8 @@
+## v0.10.1 - 2022-11-12
+
+- Fix human friendly error messages not being written to provided buffer when
+  the buffer had exactly enough room for it.
+
 ## v0.10.0 - 2022-11-09
 
 - Support converting compressed plaintext saves to uncompressed

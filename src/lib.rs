@@ -41,6 +41,7 @@ pub unsafe extern "C" fn rakaly_melt_error_code(res: *const MeltedBuffer) -> c_i
 }
 
 /// Calculate the number of bytes in the for the melted output's error message.
+/// The length excludes null termination
 ///
 /// # Safety
 ///
@@ -68,6 +69,8 @@ pub unsafe extern "C" fn rakaly_melt_error_length(res: *const MeltedBuffer) -> c
 /// If there are no recent errors then this returns `0` (because we wrote 0
 /// bytes). `-1` is returned if there are any errors, for example when passed a
 /// null pointer or a buffer of insufficient size.
+/// 
+/// The buffer will not be null terminated.
 ///
 /// # Safety
 ///
@@ -91,7 +94,7 @@ pub unsafe extern "C" fn rakaly_melt_error_write_data(
     let error_message = last_error.to_string();
     let buffer = std::slice::from_raw_parts_mut(buffer as *mut u8, length as usize);
 
-    if error_message.len() >= buffer.len() {
+    if error_message.len() > buffer.len() {
         return -1;
     }
 

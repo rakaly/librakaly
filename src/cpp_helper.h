@@ -16,7 +16,7 @@ public:
   /**
    * Updates the given string with the melted output. The string is assumed to
    * contain the data that was requested to be melted, as if the melter required
-   * no work, the string won't be written to (as it is already melted) 
+   * no work, the string won't be written to (as it is already melted)
    */
   void writeData(std::string &data) const {
     int result = rakaly_melt_error_code(melt);
@@ -41,7 +41,9 @@ public:
   }
 
   bool was_binary() const { return rakaly_melt_binary_translated(melt); }
-  bool has_unknown_tokens() const { return rakaly_melt_binary_unknown_tokens(melt); }
+  bool has_unknown_tokens() const {
+    return rakaly_melt_binary_unknown_tokens(melt);
+  }
 
   virtual ~MeltedOutput() { rakaly_free_melt(melt); }
 };

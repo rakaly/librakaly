@@ -66,10 +66,10 @@ jobs:
         cp ./release/librakaly.so .
 
         g++ sample.cpp -o melter -std=c++17 -Werror -Wall -Wextra -O2 librakaly.so
-        LD_LIBRARY_PATH=. ./melter ../assets/saves/kandy2.bin.eu4 > /dev/null
-        LD_LIBRARY_PATH=. ./melter ../assets/saves/af_Munso_867_Ironman.ck3 > /dev/null
-        LD_LIBRARY_PATH=. ./melter ../assets/saves/observer1.5.rome > /dev/null
-        LD_LIBRARY_PATH=. ./melter ../assets/saves/1.10-ironman.hoi4 > /dev/null
+        LD_LIBRARY_PATH=. ./melter save ../assets/saves/kandy2.bin.eu4 > /dev/null
+        LD_LIBRARY_PATH=. ./melter save ../assets/saves/af_Munso_867_Ironman.ck3 > /dev/null
+        LD_LIBRARY_PATH=. ./melter save ../assets/saves/observer1.5.rome > /dev/null
+        LD_LIBRARY_PATH=. ./melter save ../assets/saves/1.10-ironman.hoi4 > /dev/null
     - uses: ilammy/msvc-dev-cmd@v1
     - name: Run verifier (windows)
       if: matrix.os == 'windows-latest'
@@ -79,7 +79,7 @@ jobs:
         cp .\release\rakaly* .
 
         cl /EHsc sample.cpp /std:c++17 /link rakaly.dll.lib /out:melter.exe
-        .\melter.exe ..\assets\saves\kandy2.bin.eu4
-        .\melter.exe ..\assets\saves\af_Munso_867_Ironman.ck3
-        .\melter.exe ..\assets\saves\observer1.5.rome
-        .\melter.exe ..\assets\saves\1.10-ironman.hoi4
+        .\melter.exe save ..\assets\saves\kandy2.bin.eu4 > NUL
+        .\melter.exe save ..\assets\saves\af_Munso_867_Ironman.ck3 > NUL
+        .\melter.exe save ..\assets\saves\observer1.5.rome > NUL
+        .\melter.exe save ..\assets\saves\1.10-ironman.hoi4 > NUL

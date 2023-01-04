@@ -2,13 +2,27 @@
 #ifndef RAKALY_WRAPPER_H
 #define RAKALY_WRAPPER_H
 
+#include <optional>
 #include <stdexcept>
 #include <string>
 
 namespace rakaly {
 
+void unwrapError(PdsError *err) {
+  if (err != nullptr) {
+    int error_len = rakaly_error_length(err);
+    std::string error(error_len, ' ');
+    rakaly_error_write_data(err, error.data(), error_len);
+    rakaly_free_error(err);
+    auto msg = std::string("librakaly returned an error ") + error;
+    throw std::runtime_error(msg);
+  }
+}
+
 class MeltedOutput {
   MeltedBuffer *melt;
+
+  MeltedOutput(const MeltedOutput &) = delete;
 
 public:
   MeltedOutput(MeltedBuffer *melt) { this->melt = melt; }
@@ -19,15 +33,6 @@ public:
    * no work, the string won't be written to (as it is already melted)
    */
   void writeData(std::string &data) const {
-    int result = rakaly_melt_error_code(melt);
-    if (result) {
-      int error_len = rakaly_melt_error_length(melt);
-      std::string error(error_len, ' ');
-      rakaly_melt_error_write_data(melt, error.data(), error_len);
-      auto msg = std::string("librakaly returned an error ") + error;
-      throw std::runtime_error(msg);
-    }
-
     // The passed in data is already uncompressed plaintext
     if (rakaly_melt_is_verbatim(melt)) {
       return;
@@ -40,7 +45,6 @@ public:
     }
   }
 
-  bool was_binary() const { return rakaly_melt_binary_translated(melt); }
   bool has_unknown_tokens() const {
     return rakaly_melt_binary_unknown_tokens(melt);
   }
@@ -48,24 +52,70 @@ public:
   virtual ~MeltedOutput() { rakaly_free_melt(melt); }
 };
 
-MeltedOutput meltEu4(const std::string &data) {
-  return MeltedOutput(rakaly_eu4_melt(data.c_str(), data.length()));
+class GameFile {
+  PdsFile *file;
+
+  GameFile(const GameFile &) = delete;
+
+public:
+  GameFile(PdsFile *file) { this->file = file; }
+
+  bool is_binary() const { return rakaly_file_is_binary(file); }
+
+  std::optional<MeltedOutput> meltMeta() const {
+    PdsMeta *meta = rakaly_file_meta(file);
+    if (meta == nullptr) {
+      return std::nullopt;
+    }
+
+    MeltedBufferResult *melt_result = rakaly_file_meta_melt(meta);
+    unwrapError(rakaly_melt_error(melt_result));
+    return std::make_optional(rakaly_melt_value(melt_result));
+  }
+
+  MeltedOutput melt() const {
+    MeltedBufferResult *melt_result = rakaly_file_melt(file);
+    unwrapError(rakaly_melt_error(melt_result));
+    return MeltedOutput(rakaly_melt_value(melt_result));
+  }
+
+  virtual ~GameFile() { rakaly_free_file(file); }
+};
+
+GameFile parseEu4(const std::string &data) {
+  PdsFileResult *file_result = rakaly_eu4_file(data.c_str(), data.length());
+  unwrapError(rakaly_file_error(file_result));
+  PdsFile *file = rakaly_file_value(file_result);
+  return GameFile(file);
 }
 
-MeltedOutput meltCk3(const std::string &data) {
-  return MeltedOutput(rakaly_ck3_melt(data.c_str(), data.length()));
+GameFile parseCk3(const std::string &data) {
+  PdsFileResult *file_result = rakaly_ck3_file(data.c_str(), data.length());
+  unwrapError(rakaly_file_error(file_result));
+  PdsFile *file = rakaly_file_value(file_result);
+  return GameFile(file);
 }
 
-MeltedOutput meltImperator(const std::string &data) {
-  return MeltedOutput(rakaly_imperator_melt(data.c_str(), data.length()));
+GameFile parseImperator(const std::string &data) {
+  PdsFileResult *file_result =
+      rakaly_imperator_file(data.c_str(), data.length());
+  unwrapError(rakaly_file_error(file_result));
+  PdsFile *file = rakaly_file_value(file_result);
+  return GameFile(file);
 }
 
-MeltedOutput meltHoi4(const std::string &data) {
-  return MeltedOutput(rakaly_hoi4_melt(data.c_str(), data.length()));
+GameFile parseHoi4(const std::string &data) {
+  PdsFileResult *file_result = rakaly_hoi4_file(data.c_str(), data.length());
+  unwrapError(rakaly_file_error(file_result));
+  PdsFile *file = rakaly_file_value(file_result);
+  return GameFile(file);
 }
 
-MeltedOutput meltVic3(const std::string &data) {
-  return MeltedOutput(rakaly_vic3_melt(data.c_str(), data.length()));
+GameFile parseVic3(const std::string &data) {
+  PdsFileResult *file_result = rakaly_vic3_file(data.c_str(), data.length());
+  unwrapError(rakaly_file_error(file_result));
+  PdsFile *file = rakaly_file_value(file_result);
+  return GameFile(file);
 }
 
 } // namespace rakaly

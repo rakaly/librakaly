@@ -1,3 +1,12 @@
+## v0.11.0 - 2023-01-05
+
+Rework API so that it is no longer geared towards parsing and melting the input
+in a single step. Instead, there are now a few steps where the API can cheaply
+load the file and from there the downstream developer can decide what they want
+to do: melt the metadata first or go straight to melting the main data.
+
+See updated `sample.cpp` for new usage.
+
 ## v0.10.1 - 2022-11-12
 
 - Fix human friendly error messages not being written to provided buffer when

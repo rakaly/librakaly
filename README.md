@@ -4,22 +4,22 @@
 
 librakaly is a shared library for [PDX Tools](https://pdx.tools/eu4) functionality that exposes a C and C++ interface and can be embedded in any application that can call C or C++ code.
 
-Below is a whirlwind tour of the C++ API.
+Below is a whirlwind tour of the C++ API (for more usage, see `sample.cpp`).
 
 ```cpp
 namespace fs = std::filesystem;
 
-rakaly::MeltedOutput meltPath(fs::path filePath, const std::string &input) {
+rakaly::GameFile parseSave(fs::path filePath, const std::string &input) {
   if (filePath.extension() == ".eu4") {
-    return rakaly::meltEu4(input);
+    return rakaly::parseEu4(input);
   } else if (filePath.extension() == ".ck3") {
-    return rakaly::meltCk3(input);
+    return rakaly::parseCk3(input);
   } else if (filePath.extension() == ".hoi4") {
-    return rakaly::meltHoi4(input);
+    return rakaly::parseHoi4(input);
   } else if (filePath.extension() == ".rome") {
-    return rakaly::meltImperator(input);
+    return rakaly::parseImperator(input);
   } else if (filePath.extension() == ".v3") {
-    return rakaly::meltVic3(input);
+    return rakaly::parseVic3(input);
   } else {
     throw std::runtime_error("unrecognized file extension");
   }
@@ -27,16 +27,18 @@ rakaly::MeltedOutput meltPath(fs::path filePath, const std::string &input) {
 
 int main(int argc, const char *argv[]) {
   // ... snip getting file path and reading file ...
-  const auto melted = meltPath(filePath, input);
-  if (melted.was_binary()) {
-    std::cerr << "cool! This was converted from binary\n";
-    if (melted.has_unknown_tokens()) {
-      std::cerr << "but some fields could not be converted\n";
-      std::cerr << "and will look like '__unknown_0x' in the output\n";
-    }
+  const auto save = parseSave(filePath, input);
+  if (save.is_binary()) {
+    std::cerr << "cool! This save is binary!\n";
   }
 
-  melted.writeData(input);
+  auto melt = save.melt();
+
+  if (melt.has_unknown_tokens()) {
+    std::cerr << "unable to melt all fields\n";
+  }
+
+  melt.writeData(input);
   std::cout << input;
 }
 ```
@@ -53,13 +55,13 @@ While these steps are linux specific, librakaly can also be used with ease on wi
 - Invoke gcc as follows
 
 ```
-gcc sample.c -o melter -O2 librakaly.so
+g++ sample.cpp -std=c++17 -o melter -O2 librakaly.so
 ```
 
 - Then invoke the melter like:
 
 ```
-LD_LIBRARY_PATH=. ./melter my-ironman-save.eu4
+LD_LIBRARY_PATH=. ./melter save my-ironman-save.eu4
 ```
 
 ## Building

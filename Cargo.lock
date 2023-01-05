@@ -80,7 +80,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 [[package]]
 name = "ck3save"
 version = "0.4.3"
-source = "git+https://github.com/rakaly/ck3save.git#5fb52ec015e31f3c10c63011bec03c4d32957085"
+source = "git+https://github.com/rakaly/ck3save.git#ce62180f5a067fe0dd0c071373ccd60a8d914e66"
 dependencies = [
  "jomini",
  "libdeflater",
@@ -125,8 +125,7 @@ dependencies = [
 [[package]]
 name = "eu4save"
 version = "0.8.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9efe8a2f7c342e13c074326cdad64b67892fbcbc21e2fac34802ff94a43db09a"
+source = "git+https://github.com/rakaly/eu4save.git#9c2dac48813e8f74341a50dd1651741eec217da8"
 dependencies = [
  "jomini",
  "libdeflater",
@@ -172,8 +171,7 @@ dependencies = [
 [[package]]
 name = "hoi4save"
 version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "110351713431df4d395c31e1633aefbec285e51b867a554299c00875ea5eda58"
+source = "git+https://github.com/rakaly/hoi4save.git#f1589b96d62ab40c9f3ac792fff25703b5178304"
 dependencies = [
  "jomini",
  "serde",
@@ -183,7 +181,7 @@ dependencies = [
 [[package]]
 name = "imperator-save"
 version = "0.4.2"
-source = "git+https://github.com/rakaly/imperator-save.git#7ad89a7290be71bd320a9495657703deefae60ca"
+source = "git+https://github.com/rakaly/imperator-save.git#b6f3f6fff0e5f9367ecef49ee027c38545169368"
 dependencies = [
  "jomini",
  "libdeflater",
@@ -219,9 +217,9 @@ checksum = "4217ad341ebadf8d8e724e264f13e593e0648f5b3e94b3896a5df283be015ecc"
 
 [[package]]
 name = "jomini"
-version = "0.20.2"
+version = "0.21.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2e86d4b770f0ef605045a909617ffa9808e8e9ffa9a2d5457cc6d4df8c59b0d2"
+checksum = "d725fbaacebb9e663b0070ab631e18674c6e517dd40b23e4db04d49100a88a89"
 dependencies = [
  "jomini_derive",
  "serde",
@@ -272,6 +270,7 @@ dependencies = [
  "hoi4save",
  "imperator-save",
  "libc",
+ "thiserror",
  "vic3save",
 ]
 
@@ -468,7 +467,7 @@ checksum = "f1bddf1187be692e79c5ffeab891132dfb0f236ed36a43c7ed39f1165ee20191"
 [[package]]
 name = "vic3save"
 version = "0.1.0"
-source = "git+https://github.com/pdx-tools/pdx-tools#7d42d9dfebdcf8865f9a8dfd784f29f94933dd1e"
+source = "git+https://github.com/pdx-tools/pdx-tools#2d1f869c46f05e5a7298145ba5038fd9c2f8a2fd"
 dependencies = [
  "jomini",
  "libdeflater",

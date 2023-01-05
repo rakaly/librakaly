@@ -1,111 +1,13 @@
+mod errors;
+mod file;
+mod melter;
+
+use crate::errors::LibError;
+use errors::PdsError;
+use file::{PdsFile, PdsFileResult, PdsMeta};
 use libc::{c_char, c_int, c_uchar, size_t};
-use std::error::Error;
-
-/// An opaque struct that holds the results of the melting operatation
-pub enum MeltedBuffer {
-    Verbatim,
-    Text { header: Vec<u8>, body: Vec<u8> },
-    Binary { body: Vec<u8>, unknown_tokens: bool },
-    Error(Box<dyn Error>),
-}
-
-impl MeltedBuffer {
-    fn len(&self) -> usize {
-        match self {
-            MeltedBuffer::Verbatim => 0,
-            MeltedBuffer::Text { header, body } => header.len() + body.len(),
-            MeltedBuffer::Binary { body, .. } => body.len(),
-            MeltedBuffer::Error(_) => 0,
-        }
-    }
-}
-
-/// A non-zero return value indicates an error with the melted buffer
-///
-/// A non-zero status code can occur from the following:
-///
-///  - An early EOF
-///  - Invalid format encountered
-///  - Too many close delimiters
-///
-/// # Safety
-///
-/// Must pass in a valid pointer to a `MeltedBuffer`
-#[no_mangle]
-pub unsafe extern "C" fn rakaly_melt_error_code(res: *const MeltedBuffer) -> c_int {
-    if res.is_null() || matches!(&*res, MeltedBuffer::Error(_)) {
-        -1
-    } else {
-        0
-    }
-}
-
-/// Calculate the number of bytes in the for the melted output's error message.
-/// The length excludes null termination
-///
-/// # Safety
-///
-/// Must pass in a valid pointer to a `MeltedBuffer`
-#[no_mangle]
-pub unsafe extern "C" fn rakaly_melt_error_length(res: *const MeltedBuffer) -> c_int {
-    if res.is_null() {
-        0
-    } else {
-        match &*res {
-            MeltedBuffer::Error(x) => x.to_string().len() as c_int,
-            _ => 0,
-        }
-    }
-}
-
-/// Write the most recent error message into a caller-provided buffer as a UTF-8
-/// string, returning the number of bytes written.
-///
-/// # Note
-///
-/// This writes a **UTF-8** string into the buffer. Windows users may need to
-/// convert it to a UTF-16 "unicode" afterwards.
-///
-/// If there are no recent errors then this returns `0` (because we wrote 0
-/// bytes). `-1` is returned if there are any errors, for example when passed a
-/// null pointer or a buffer of insufficient size.
-/// 
-/// The buffer will not be null terminated.
-///
-/// # Safety
-///
-/// - Must pass in a valid pointer to a `MeltedBuffer`
-/// - Given buffer must be at least the given length in size
-#[no_mangle]
-pub unsafe extern "C" fn rakaly_melt_error_write_data(
-    res: *const MeltedBuffer,
-    buffer: *mut c_char,
-    length: c_int,
-) -> c_int {
-    if res.is_null() || buffer.is_null() {
-        return -1;
-    }
-
-    let last_error = match &*res {
-        MeltedBuffer::Error(e) => e,
-        _ => return 0,
-    };
-
-    let error_message = last_error.to_string();
-    let buffer = std::slice::from_raw_parts_mut(buffer as *mut u8, length as usize);
-
-    if error_message.len() > buffer.len() {
-        return -1;
-    }
-
-    std::ptr::copy_nonoverlapping(
-        error_message.as_ptr(),
-        buffer.as_mut_ptr(),
-        error_message.len(),
-    );
-
-    error_message.len() as c_int
-}
+use melter::{MeltedBuffer, MeltedBufferResult};
+use std::hint::unreachable_unchecked;
 
 /// Destroys a `MeltedBuffer` once you are done with it.
 ///
@@ -145,20 +47,6 @@ pub unsafe extern "C" fn rakaly_melt_is_verbatim(res: *const MeltedBuffer) -> bo
     }
 
     matches!(&*res, MeltedBuffer::Verbatim)
-}
-
-/// Returns true if the melter needed to convert the binary input
-///
-/// # Safety
-///
-/// Must pass in a valid pointer to a `MeltedBuffer`
-#[no_mangle]
-pub unsafe extern "C" fn rakaly_melt_binary_translated(res: *const MeltedBuffer) -> bool {
-    if res.is_null() {
-        return false;
-    }
-
-    matches!(&*res, MeltedBuffer::Binary { .. })
 }
 
 /// Returns true if the melter encountered unknown tokens in the binary input
@@ -209,7 +97,7 @@ pub unsafe extern "C" fn rakaly_melt_write_data(
     }
 
     let res = &*res;
-    let buffer: &mut [u8] = std::slice::from_raw_parts_mut(buffer as *mut u8, length as usize);
+    let buffer: &mut [u8] = std::slice::from_raw_parts_mut(buffer as *mut u8, length);
 
     if buffer.len() < res.len() {
         return 0;
@@ -225,275 +113,401 @@ pub unsafe extern "C" fn rakaly_melt_write_data(
         MeltedBuffer::Binary { body, .. } => {
             std::ptr::copy_nonoverlapping(body.as_ptr(), buffer.as_mut_ptr(), body.len());
         }
-        MeltedBuffer::Error(_) => {}
     }
 
     res.len()
 }
 
-/// Converts a save into uncompressed plaintext data.
+/// Consume a result and return the underyling error. If the result does not
+/// encompass an error, the result is not consumed.
 ///
-/// Parameters:
+/// # Safety
 ///
-///  - data: Pointer to the save data to convert. It is valid for this data to
-///    be uncompressed plaintext data, compressed plaintext data, or binary data
-///  - data_len: Length of the data indicated by the data pointer. It is
-///    undefined behavior if the given length does not match the actual length
-///    of the data
+/// - Must pass in a valid pointer to a `PdsFileResult`
+#[no_mangle]
+pub unsafe extern "C" fn rakaly_file_error(ptr: *mut PdsFileResult<'static>) -> *mut PdsError {
+    if ptr.is_null() {
+        return std::ptr::null_mut();
+    }
+
+    match &*ptr {
+        PdsFileResult::Ok(_) => std::ptr::null_mut(),
+        PdsFileResult::Err(e) => {
+            let res = Box::from_raw(ptr);
+            let error = Box::into_raw(Box::new(PdsError::from(e)));
+            drop(res);
+            error
+        }
+    }
+}
+
+/// Calculate the number of bytes in the for the melted output's error message.
+/// The length excludes null termination
 ///
-/// If an unknown binary token is encountered there are two possible outcomes:
+/// # Safety
 ///
-///  - If the token is part of an object's key, then key and value will not
-///    appear in the plaintext output
-///  - Else the object value (or array value) will be string of "__unknown_x0$z"
-///    where z is the hexadecimal representation of the unknown token.
+/// Must pass in a valid pointer to a `PdsError`
 #[no_mangle]
-pub extern "C" fn rakaly_eu4_melt(data_ptr: *const c_char, data_len: size_t) -> *mut MeltedBuffer {
-    std::panic::catch_unwind(|| {
-        let result =
-            _rakaly_eu4_melt(data_ptr, data_len).unwrap_or_else(|e| MeltedBuffer::Error(e));
-        Box::into_raw(Box::new(result))
-    })
-    .unwrap_or(std::ptr::null_mut())
-}
-
-fn _rakaly_eu4_melt(
-    data_ptr: *const c_char,
-    data_len: size_t,
-) -> Result<MeltedBuffer, Box<dyn Error>> {
-    use eu4save::{file::Eu4ParsedFileKind, Encoding};
-
-    let dp = data_ptr as *const c_uchar;
-    let data = unsafe { std::slice::from_raw_parts(dp, data_len) };
-    let file = eu4save::Eu4File::from_slice(data)?;
-
-    if matches!(file.encoding(), Encoding::Text) {
-        return Ok(MeltedBuffer::Verbatim);
-    }
-
-    let mut zip_sink = Vec::new();
-    let parsed = file.parse(&mut zip_sink)?;
-    match parsed.kind() {
-        Eu4ParsedFileKind::Text(_) => Ok(MeltedBuffer::Text {
-            header: b"EU4txt".to_vec(),
-            body: zip_sink,
-        }),
-        Eu4ParsedFileKind::Binary(bin) => {
-            let melted = bin
-                .melter()
-                .on_failed_resolve(eu4save::FailedResolveStrategy::Stringify)
-                .verbatim(true)
-                .melt(&eu4save::EnvTokens)?;
-
-            Ok(MeltedBuffer::Binary {
-                unknown_tokens: !melted.unknown_tokens().is_empty(),
-                body: melted.into_data(),
-            })
-        }
+pub unsafe extern "C" fn rakaly_error_length(res: *const PdsError) -> c_int {
+    if res.is_null() {
+        0
+    } else {
+        (*res).msg().len() as c_int
     }
 }
 
-/// See `rakaly_eu4_melt` for more information
+/// Write the most recent error message into a caller-provided buffer as a UTF-8
+/// string, returning the number of bytes written.
+///
+/// # Note
+///
+/// This writes a **UTF-8** string into the buffer. Windows users may need to
+/// convert it to a UTF-16 "unicode" afterwards.
+///
+/// `-1` is returned if there are any errors, for example when passed a
+/// null pointer or a buffer of insufficient size.
+///
+/// The buffer will not be null terminated.
+///
+/// # Safety
+///
+/// - Must pass in a valid pointer to a `PdsError`
+/// - Given buffer must be at least the given length in size
 #[no_mangle]
-pub extern "C" fn rakaly_ck3_melt(data_ptr: *const c_char, data_len: size_t) -> *mut MeltedBuffer {
-    std::panic::catch_unwind(|| {
-        let result =
-            _rakaly_ck3_melt(data_ptr, data_len).unwrap_or_else(|e| MeltedBuffer::Error(e));
-        Box::into_raw(Box::new(result))
-    })
-    .unwrap_or(std::ptr::null_mut())
-}
-
-fn _rakaly_ck3_melt(
-    data_ptr: *const c_char,
-    data_len: size_t,
-) -> Result<MeltedBuffer, Box<dyn Error>> {
-    use ck3save::{file::Ck3ParsedFileKind, Encoding, SaveHeaderKind};
-
-    let dp = data_ptr as *const c_uchar;
-    let data = unsafe { std::slice::from_raw_parts(dp, data_len) };
-    let file = ck3save::Ck3File::from_slice(data)?;
-
-    if matches!(file.encoding(), Encoding::Text) {
-        return Ok(MeltedBuffer::Verbatim);
+pub unsafe extern "C" fn rakaly_error_write_data(
+    res: *const PdsError,
+    buffer: *mut c_char,
+    length: c_int,
+) -> c_int {
+    if res.is_null() || buffer.is_null() {
+        return -1;
     }
 
-    let mut zip_sink = Vec::new();
-    let parsed = file.parse(&mut zip_sink)?;
-    match parsed.kind() {
-        Ck3ParsedFileKind::Text(_) => {
-            let mut new_header = file.header().clone();
-            new_header.set_kind(SaveHeaderKind::Text);
-            let mut out_header = Vec::new();
-            new_header.write(&mut out_header).unwrap();
-            Ok(MeltedBuffer::Text {
-                header: out_header,
-                body: zip_sink,
-            })
-        }
-        Ck3ParsedFileKind::Binary(bin) => {
-            let melted = bin
-                .melter()
-                .on_failed_resolve(ck3save::FailedResolveStrategy::Stringify)
-                .verbatim(true)
-                .melt(&ck3save::EnvTokens)?;
+    let err = &*res;
+    let buffer = std::slice::from_raw_parts_mut(buffer as *mut u8, length as usize);
 
-            Ok(MeltedBuffer::Binary {
-                unknown_tokens: !melted.unknown_tokens().is_empty(),
-                body: melted.into_data(),
-            })
-        }
+    if err.msg().len() > buffer.len() {
+        return -1;
     }
+
+    std::ptr::copy_nonoverlapping(err.msg().as_ptr(), buffer.as_mut_ptr(), err.msg().len());
+
+    err.msg().len() as c_int
 }
 
-/// See `rakaly_eu4_melt` for more information
+/// Destroys a `PdsError`
+///
+/// # Safety
+///
+/// Must pass in a valid pointer to a `MeltedBuffer`
 #[no_mangle]
-pub extern "C" fn rakaly_imperator_melt(
-    data_ptr: *const c_char,
-    data_len: size_t,
-) -> *mut MeltedBuffer {
-    std::panic::catch_unwind(|| {
-        let result =
-            _rakaly_imperator_melt(data_ptr, data_len).unwrap_or_else(|e| MeltedBuffer::Error(e));
-        Box::into_raw(Box::new(result))
-    })
-    .unwrap_or(std::ptr::null_mut())
-}
-
-fn _rakaly_imperator_melt(
-    data_ptr: *const c_char,
-    data_len: size_t,
-) -> Result<MeltedBuffer, Box<dyn Error>> {
-    use imperator_save::{file::ImperatorParsedFileKind, Encoding, SaveHeaderKind};
-
-    let dp = data_ptr as *const c_uchar;
-    let data = unsafe { std::slice::from_raw_parts(dp, data_len) };
-    let file = imperator_save::ImperatorFile::from_slice(data)?;
-
-    if matches!(file.encoding(), Encoding::Text) {
-        return Ok(MeltedBuffer::Verbatim);
-    }
-
-    let mut zip_sink = Vec::new();
-    let parsed = file.parse(&mut zip_sink)?;
-    match parsed.kind() {
-        ImperatorParsedFileKind::Text(_) => {
-            let mut new_header = file.header().clone();
-            new_header.set_kind(SaveHeaderKind::Text);
-            let mut out_header = Vec::new();
-            new_header.write(&mut out_header).unwrap();
-            Ok(MeltedBuffer::Text {
-                header: out_header,
-                body: zip_sink,
-            })
-        }
-        ImperatorParsedFileKind::Binary(bin) => {
-            let melted = bin
-                .melter()
-                .on_failed_resolve(imperator_save::FailedResolveStrategy::Stringify)
-                .verbatim(true)
-                .melt(&imperator_save::EnvTokens)?;
-
-            Ok(MeltedBuffer::Binary {
-                unknown_tokens: !melted.unknown_tokens().is_empty(),
-                body: melted.into_data(),
-            })
-        }
+pub unsafe extern "C" fn rakaly_free_error(res: *mut PdsError) {
+    if !res.is_null() {
+        drop(Box::from_raw(res));
     }
 }
 
-/// See `rakaly_eu4_melt` for more information
+/// Destroys a `PdsFile`
+///
+/// # Safety
+///
+/// Must pass in a valid pointer to a `PdsFile`
 #[no_mangle]
-pub extern "C" fn rakaly_hoi4_melt(data_ptr: *const c_char, data_len: size_t) -> *mut MeltedBuffer {
-    std::panic::catch_unwind(|| {
-        let result =
-            _rakaly_hoi4_melt(data_ptr, data_len).unwrap_or_else(|e| MeltedBuffer::Error(e));
-        Box::into_raw(Box::new(result))
-    })
-    .unwrap_or(std::ptr::null_mut())
-}
-
-fn _rakaly_hoi4_melt(
-    data_ptr: *const c_char,
-    data_len: size_t,
-) -> Result<MeltedBuffer, Box<dyn Error>> {
-    use hoi4save::{file::Hoi4ParsedFileKind, Encoding};
-
-    let dp = data_ptr as *const c_uchar;
-    let data = unsafe { std::slice::from_raw_parts(dp, data_len) };
-
-    let file = hoi4save::Hoi4File::from_slice(data)?;
-    if matches!(file.encoding(), Encoding::Plaintext) {
-        return Ok(MeltedBuffer::Verbatim);
-    }
-
-    let parsed = file.parse()?;
-    match parsed.kind() {
-        Hoi4ParsedFileKind::Text(_) => Ok(MeltedBuffer::Verbatim),
-        Hoi4ParsedFileKind::Binary(bin) => {
-            let melted = bin
-                .melter()
-                .on_failed_resolve(hoi4save::FailedResolveStrategy::Stringify)
-                .verbatim(true)
-                .melt(&hoi4save::EnvTokens)?;
-
-            Ok(MeltedBuffer::Binary {
-                unknown_tokens: !melted.unknown_tokens().is_empty(),
-                body: melted.into_data(),
-            })
-        }
+pub unsafe extern "C" fn rakaly_free_file(res: *mut PdsFile) {
+    if !res.is_null() {
+        drop(Box::from_raw(res));
     }
 }
 
-/// See `rakaly_eu4_melt` for more information
+/// Consume a result and return the underyling value. If the result does not
+/// encompass a value, the result is not consumed.
+///
+/// # Safety
+///
+/// - Must pass in a valid pointer to a `PdsFileResult`
 #[no_mangle]
-pub extern "C" fn rakaly_vic3_melt(data_ptr: *const c_char, data_len: size_t) -> *mut MeltedBuffer {
-    std::panic::catch_unwind(|| {
-        let result =
-            _rakaly_vic3_melt(data_ptr, data_len).unwrap_or_else(|e| MeltedBuffer::Error(e));
-        Box::into_raw(Box::new(result))
-    })
-    .unwrap_or(std::ptr::null_mut())
-}
-
-fn _rakaly_vic3_melt(
-    data_ptr: *const c_char,
-    data_len: size_t,
-) -> Result<MeltedBuffer, Box<dyn Error>> {
-    use vic3save::{file::Vic3ParsedFileKind, Encoding, SaveHeaderKind};
-
-    let dp = data_ptr as *const c_uchar;
-    let data = unsafe { std::slice::from_raw_parts(dp, data_len) };
-    let file = vic3save::Vic3File::from_slice(data)?;
-
-    if matches!(file.encoding(), Encoding::Text) {
-        return Ok(MeltedBuffer::Verbatim);
+pub unsafe extern "C" fn rakaly_file_value(ptr: *mut PdsFileResult<'static>) -> *mut PdsFile {
+    if ptr.is_null() {
+        return std::ptr::null_mut();
     }
 
-    let mut zip_sink = Vec::new();
-    let parsed = file.parse(&mut zip_sink)?;
-    match parsed.kind() {
-        Vic3ParsedFileKind::Text(_) => {
-            let mut new_header = file.header().clone();
-            new_header.set_kind(SaveHeaderKind::Text);
-            let mut out_header = Vec::new();
-            new_header.write(&mut out_header).unwrap();
-            Ok(MeltedBuffer::Text {
-                header: out_header,
-                body: zip_sink,
-            })
+    match &*ptr {
+        PdsFileResult::Ok(_) => {
+            let res = Box::from_raw(ptr);
+            match *res {
+                PdsFileResult::Ok(file) => Box::into_raw(Box::new(file)),
+                PdsFileResult::Err(_) => unreachable_unchecked(),
+            }
         }
-        Vic3ParsedFileKind::Binary(bin) => {
-            let melted = bin
-                .melter()
-                .on_failed_resolve(vic3save::FailedResolveStrategy::Stringify)
-                .verbatim(true)
-                .melt(&vic3save::EnvTokens)?;
+        PdsFileResult::Err(_) => std::ptr::null_mut(),
+    }
+}
 
-            Ok(MeltedBuffer::Binary {
-                unknown_tokens: !melted.unknown_tokens().is_empty(),
-                body: melted.into_data(),
-            })
+/// Returns a pointer to data that can decode a save's metadata. If a save does
+/// not have easily extractable metadata, then a null pointer is returned.
+///
+/// # Safety
+///
+/// - Must pass in a valid pointer to a `PdsFile`
+#[no_mangle]
+pub unsafe extern "C" fn rakaly_file_meta(ptr: *const PdsFile<'static>) -> *mut PdsMeta {
+    if ptr.is_null() {
+        return std::ptr::null_mut();
+    }
+
+    (*ptr)
+        .meta()
+        .map(|x| Box::into_raw(Box::new(x)))
+        .unwrap_or(std::ptr::null_mut())
+}
+
+/// Return the result of converting the metadata of a save to plaintext
+///
+/// # Safety
+///
+/// - Must pass in a valid pointer to a `PdsMeta`
+#[no_mangle]
+pub unsafe extern "C" fn rakaly_file_meta_melt(ptr: *const PdsMeta) -> *mut MeltedBufferResult {
+    if ptr.is_null() {
+        return std::ptr::null_mut();
+    }
+
+    let res = std::panic::catch_unwind(|| {
+        let result = match (*ptr).melt() {
+            Ok(x) => MeltedBufferResult::Ok(x),
+            Err(err) => MeltedBufferResult::Err(err),
+        };
+        Box::into_raw(Box::new(result))
+    });
+
+    match res {
+        Ok(x) => x,
+        Err(_) => Box::into_raw(Box::new(MeltedBufferResult::Err(LibError::Panic))),
+    }
+}
+
+/// Return the result of converting the save to plaintext
+///
+/// # Safety
+///
+/// - Must pass in a valid pointer to a `PdsFile`
+#[no_mangle]
+pub unsafe extern "C" fn rakaly_file_melt(ptr: *const PdsFile) -> *mut MeltedBufferResult {
+    if ptr.is_null() {
+        return std::ptr::null_mut();
+    }
+
+    let res = std::panic::catch_unwind(|| {
+        let result = match (*ptr).melt_file() {
+            Ok(x) => MeltedBufferResult::Ok(x),
+            Err(err) => MeltedBufferResult::Err(err),
+        };
+        Box::into_raw(Box::new(result))
+    });
+
+    match res {
+        Ok(x) => x,
+        Err(_) => Box::into_raw(Box::new(MeltedBufferResult::Err(LibError::Panic))),
+    }
+}
+
+/// Returns true if the melter needed to convert the binary input
+///
+/// # Safety
+///
+/// Must pass in a valid pointer to a `MeltedBuffer`
+#[no_mangle]
+pub unsafe extern "C" fn rakaly_file_is_binary(res: *const PdsFile) -> bool {
+    if res.is_null() {
+        return false;
+    }
+
+    (*res).is_binary()
+}
+
+/// Consume a result and return the underyling error. If the result does not
+/// encompass an error, the result is not consumed.
+///
+/// # Safety
+///
+/// - Must pass in a valid pointer to a `MeltedBufferResult`
+#[no_mangle]
+pub unsafe extern "C" fn rakaly_melt_error(ptr: *mut MeltedBufferResult) -> *mut PdsError {
+    if ptr.is_null() {
+        return std::ptr::null_mut();
+    }
+
+    match &*ptr {
+        MeltedBufferResult::Ok(_) => std::ptr::null_mut(),
+        MeltedBufferResult::Err(e) => {
+            let res = Box::from_raw(ptr);
+            let error = Box::into_raw(Box::new(PdsError::from(e)));
+            drop(res);
+            error
         }
+    }
+}
+
+/// Consume a result and return the underyling value. If the result does not
+/// encompass a value, the result is not consumed.
+///
+/// # Safety
+///
+/// - Must pass in a valid pointer to a `MeltedBufferResult`
+#[no_mangle]
+pub unsafe extern "C" fn rakaly_melt_value(ptr: *mut MeltedBufferResult) -> *mut MeltedBuffer {
+    if ptr.is_null() {
+        return std::ptr::null_mut();
+    }
+
+    match &*ptr {
+        MeltedBufferResult::Ok(_) => {
+            let res = Box::from_raw(ptr);
+            match *res {
+                MeltedBufferResult::Ok(buf) => Box::into_raw(Box::new(buf)),
+                MeltedBufferResult::Err(_) => unreachable_unchecked(),
+            }
+        }
+        MeltedBufferResult::Err(_) => std::ptr::null_mut(),
+    }
+}
+
+/// Initializes an EU4 save from a pointer the save data bytes and a number of
+/// those bytes.
+///
+/// # Safety
+///
+/// The data is assumed to exist for the duration while the result of this
+/// function lives.
+#[no_mangle]
+pub unsafe extern "C" fn rakaly_eu4_file(
+    data_ptr: *const c_char,
+    data_len: size_t,
+) -> *mut PdsFileResult<'static> {
+    let res = std::panic::catch_unwind(|| {
+        let dp = data_ptr as *const c_uchar;
+        let data = unsafe { std::slice::from_raw_parts(dp, data_len) };
+        let result = match eu4save::Eu4File::from_slice(data) {
+            Ok(x) => PdsFileResult::Ok(PdsFile::Eu4(x)),
+            Err(err) => PdsFileResult::Err(err.into()),
+        };
+        Box::into_raw(Box::new(result))
+    });
+
+    match res {
+        Ok(x) => x,
+        Err(_) => Box::into_raw(Box::new(PdsFileResult::Err(LibError::Panic))),
+    }
+}
+
+/// Initializes an CK3 save from a pointer the save data bytes and a number of
+/// those bytes.
+///
+/// # Safety
+///
+/// The data is assumed to exist for the duration while the result of this
+/// function lives.
+#[no_mangle]
+pub unsafe extern "C" fn rakaly_ck3_file(
+    data_ptr: *const c_char,
+    data_len: size_t,
+) -> *mut PdsFileResult<'static> {
+    let res = std::panic::catch_unwind(|| {
+        let dp = data_ptr as *const c_uchar;
+        let data = unsafe { std::slice::from_raw_parts(dp, data_len) };
+        let result = match ck3save::Ck3File::from_slice(data) {
+            Ok(x) => PdsFileResult::Ok(PdsFile::Ck3(x)),
+            Err(err) => PdsFileResult::Err(err.into()),
+        };
+        Box::into_raw(Box::new(result))
+    });
+
+    match res {
+        Ok(x) => x,
+        Err(_) => Box::into_raw(Box::new(PdsFileResult::Err(LibError::Panic))),
+    }
+}
+
+/// Initializes an Imperator save from a pointer the save data bytes and a number of
+/// those bytes.
+///
+/// # Safety
+///
+/// The data is assumed to exist for the duration while the result of this
+/// function lives.
+#[no_mangle]
+pub unsafe extern "C" fn rakaly_imperator_file(
+    data_ptr: *const c_char,
+    data_len: size_t,
+) -> *mut PdsFileResult<'static> {
+    let res = std::panic::catch_unwind(|| {
+        let dp = data_ptr as *const c_uchar;
+        let data = unsafe { std::slice::from_raw_parts(dp, data_len) };
+        let result = match imperator_save::ImperatorFile::from_slice(data) {
+            Ok(x) => PdsFileResult::Ok(PdsFile::Imperator(x)),
+            Err(err) => PdsFileResult::Err(err.into()),
+        };
+        Box::into_raw(Box::new(result))
+    });
+
+    match res {
+        Ok(x) => x,
+        Err(_) => Box::into_raw(Box::new(PdsFileResult::Err(LibError::Panic))),
+    }
+}
+
+/// Initializes an HOI4 save from a pointer the save data bytes and a number of
+/// those bytes.
+///
+/// # Safety
+///
+/// The data is assumed to exist for the duration while the result of this
+/// function lives.
+#[no_mangle]
+pub unsafe extern "C" fn rakaly_hoi4_file(
+    data_ptr: *const c_char,
+    data_len: size_t,
+) -> *mut PdsFileResult<'static> {
+    let res = std::panic::catch_unwind(|| {
+        let dp = data_ptr as *const c_uchar;
+        let data = unsafe { std::slice::from_raw_parts(dp, data_len) };
+        let result = match hoi4save::Hoi4File::from_slice(data) {
+            Ok(x) => PdsFileResult::Ok(PdsFile::Hoi4(x)),
+            Err(err) => PdsFileResult::Err(err.into()),
+        };
+        Box::into_raw(Box::new(result))
+    });
+
+    match res {
+        Ok(x) => x,
+        Err(_) => Box::into_raw(Box::new(PdsFileResult::Err(LibError::Panic))),
+    }
+}
+
+/// Initializes a Vic3 save from a pointer the save data bytes and a number of
+/// those bytes.
+///
+/// # Safety
+///
+/// The data is assumed to exist for the duration while the result of this
+/// function lives.
+#[no_mangle]
+pub unsafe extern "C" fn rakaly_vic3_file(
+    data_ptr: *const c_char,
+    data_len: size_t,
+) -> *mut PdsFileResult<'static> {
+    let res = std::panic::catch_unwind(|| {
+        let dp = data_ptr as *const c_uchar;
+        let data = unsafe { std::slice::from_raw_parts(dp, data_len) };
+        let result = match vic3save::Vic3File::from_slice(data) {
+            Ok(x) => PdsFileResult::Ok(PdsFile::Vic3(x)),
+            Err(err) => PdsFileResult::Err(err.into()),
+        };
+        Box::into_raw(Box::new(result))
+    });
+
+    match res {
+        Ok(x) => x,
+        Err(_) => Box::into_raw(Box::new(PdsFileResult::Err(LibError::Panic))),
     }
 }

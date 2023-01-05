@@ -15,38 +15,59 @@ std::string readFile(fs::path filePath) {
   return result;
 }
 
-rakaly::MeltedOutput meltPath(fs::path filePath, const std::string &input) {
+rakaly::GameFile parseSave(fs::path filePath, const std::string &input) {
   if (filePath.extension() == ".eu4") {
-    return rakaly::meltEu4(input);
+    return rakaly::parseEu4(input);
   } else if (filePath.extension() == ".ck3") {
-    return rakaly::meltCk3(input);
+    return rakaly::parseCk3(input);
   } else if (filePath.extension() == ".hoi4") {
-    return rakaly::meltHoi4(input);
+    return rakaly::parseHoi4(input);
   } else if (filePath.extension() == ".rome") {
-    return rakaly::meltImperator(input);
+    return rakaly::parseImperator(input);
   } else if (filePath.extension() == ".v3") {
-    return rakaly::meltVic3(input);
+    return rakaly::parseVic3(input);
   } else {
     throw std::runtime_error("unrecognized file extension");
   }
 }
 
 int main(int argc, const char *argv[]) {
-  if (argc != 2) {
-    std::cerr << "expected one file argument\n";
+  if (argc != 3) {
+    std::cerr << "expected [melt/save] and one file argument\n";
     return 1;
   }
-  fs::path filePath = argv[1];
+
+  fs::path filePath = argv[2];
   std::string input = readFile(filePath);
 
-  const auto melted = meltPath(filePath, input);
-  if (melted.was_binary()) {
-    std::cerr << "cool! This was converted from binary\n";
-    if (melted.has_unknown_tokens()) {
-      std::cerr << "but some fields could not be converted\n";
-      std::cerr << "and will look like '__unknown_0x' in the output\n";
-    }
+  const auto save = parseSave(filePath, input);
+  if (save.is_binary()) {
+    std::cerr << "cool! This save is binary!\n";
   }
-  melted.writeData(input);
-  std::cout << input;
+
+  if (argv[1] == std::string("meta")) {
+    if (auto melt = save.meltMeta()) {
+      if (melt->has_unknown_tokens()) {
+        std::cerr << "unable to melt all fields\n";
+      }
+
+      std::string out;
+      melt->writeData(out);
+      std::cout << out;
+    } else {
+      std::cerr << "unable to easily extract meta\n";
+    }
+  } else if (argv[1] == std::string("save")) {
+    auto melt = save.melt();
+
+    if (melt.has_unknown_tokens()) {
+      std::cerr << "unable to melt all fields\n";
+    }
+
+    // Re-use input buffer in case no work needs to be done
+    melt.writeData(input);
+    std::cout << input;
+  } else {
+    throw std::runtime_error("unrecognized command [melt/save]");
+  }
 }

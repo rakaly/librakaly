@@ -118,7 +118,7 @@ pub unsafe extern "C" fn rakaly_melt_write_data(
     res.len()
 }
 
-/// Consume a result and return the underyling error. If the result does not
+/// Consume a result and return the underlying error. If the result does not
 /// encompass an error, the result is not consumed.
 ///
 /// # Safety
@@ -219,7 +219,7 @@ pub unsafe extern "C" fn rakaly_free_file(res: *mut PdsFile) {
     }
 }
 
-/// Consume a result and return the underyling value. If the result does not
+/// Consume a result and return the underlying value. If the result does not
 /// encompass a value, the result is not consumed.
 ///
 /// # Safety
@@ -325,7 +325,7 @@ pub unsafe extern "C" fn rakaly_file_is_binary(res: *const PdsFile) -> bool {
     (*res).is_binary()
 }
 
-/// Consume a result and return the underyling error. If the result does not
+/// Consume a result and return the underlying error. If the result does not
 /// encompass an error, the result is not consumed.
 ///
 /// # Safety
@@ -348,7 +348,7 @@ pub unsafe extern "C" fn rakaly_melt_error(ptr: *mut MeltedBufferResult) -> *mut
     }
 }
 
-/// Consume a result and return the underyling value. If the result does not
+/// Consume a result and return the underlying value. If the result does not
 /// encompass a value, the result is not consumed.
 ///
 /// # Safety

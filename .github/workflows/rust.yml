@@ -17,7 +17,7 @@ jobs:
         - win-msvc
         include:
         - build: linux
-          os: ubuntu-latest
+          os: ubuntu-20.04
         - build: macos
           os: macos-latest
         - build: win-msvc
@@ -58,7 +58,7 @@ jobs:
         [ ! -f 1.10-ironman.zip ] && curl -O https://hoi4saves-test-cases.s3.us-west-002.backblazeb2.com/1.10-ironman.zip && unzip 1.10-ironman.zip || true
       working-directory: ./assets/saves
     - name: Run verifier
-      if: matrix.os == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-20.04'
       working-directory: ./target
       run: |
         set -eou

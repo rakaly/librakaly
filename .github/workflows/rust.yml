@@ -83,3 +83,75 @@ jobs:
         .\melter.exe save ..\assets\saves\af_Munso_867_Ironman.ck3 > NUL
         .\melter.exe save ..\assets\saves\observer1.5.rome > NUL
         .\melter.exe save ..\assets\saves\1.10-ironman.hoi4 > NUL
+    - name: Stage Release
+      shell: bash
+      run: |
+        if [[ "${GITHUB_REF}" = *refs/tags/* ]]; then
+          VERSION="${GITHUB_REF#refs/tags/}"
+        else
+          VERSION="vnightly"
+        fi
+        echo "version is $VERSION"
+        STAGING="librakaly-${VERSION:1}"
+        echo "STAGING DIR: $STAGING"
+        mkdir $STAGING 
+        if [[ "${{ matrix.os }}" = windows* ]]; then
+          cp target/release/rakaly.{dll,dll.lib} "$STAGING/"
+          cp target/rakaly.h "$STAGING/"
+        else
+          find target/release -maxdepth 1 -name "librakaly.so" -o -name "librakaly.dylib" | xargs -I{} cp {} "$STAGING/"
+        fi
+        echo "ASSET=$STAGING" >> $GITHUB_ENV
+    - uses: actions/upload-artifact@v3
+      with:
+        path: ${{ env.ASSET }}
+        name: ${{ env.ASSET }}
+        if-no-files-found: error
+
+  release:
+    needs: test
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/download-artifact@v3
+      with:
+        path: artifacts-temp
+    - name: Flatten artifacts
+      run: |
+        mkdir artifacts
+        cd artifacts-temp
+        for i in *; do
+          if [[ "$i" = *windows* ]]; then
+            7z a "../artifacts/$(basename "$i").zip" "$i"
+          else
+            tar czf "../artifacts/$(basename "$i").tar.gz" "$i"
+          fi
+        done
+        ls -lR ../artifacts
+    - name: Create Release
+      if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          console.log('environment', process.versions);
+          const fs = require('fs').promises;
+          const { repo: { owner, repo }, sha } = context;
+          console.log({ owner, repo, sha });
+          const tag_name = process.env.GITHUB_REF.split("/")[2];
+          const release = await github.rest.repos.createRelease({
+            owner, repo,
+            tag_name,
+            draft: false,
+            target_commitish: sha
+          });
+          console.log('created release', { release });
+          for (let file of await fs.readdir('artifacts')) {
+            console.log('uploading', file);
+            await github.rest.repos.uploadReleaseAsset({
+              owner, repo,
+              release_id: release.data.id,
+              name: file,
+              data: await fs.readFile(`artifacts/${file}`)
+            });
+          }

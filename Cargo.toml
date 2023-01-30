@@ -24,3 +24,6 @@ thiserror = "1.0"
 
 [build-dependencies]
 cbindgen = "0.20"
+
+[profile.release]
+strip = true

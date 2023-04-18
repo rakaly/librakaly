@@ -1,3 +1,7 @@
+## v0.11.1 - 2023-04-18
+
+- Update EU4 tokens to 1.35
+
 ## v0.11.0 - 2023-01-05
 
 Rework API so that it is no longer geared towards parsing and melting the input

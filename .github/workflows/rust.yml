@@ -24,16 +24,17 @@ jobs:
           os: windows-latest
     steps:
     - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
+      name: Clone tokens
+      with:
+        path: assets/
+        repository: pdx-tools/tokens
+        token: ${{secrets.GH_PAT}}
     - name: Cache saves
       uses: actions/cache@v3
       with:
         path: assets/saves
         key: assets/saves
-    - name: Decrypt tokens
-      run: ./assets/ci/decrypt_secret.sh
-      shell: bash
-      env:
-        TOKEN_PASSPHRASE: ${{ secrets.TOKEN_PASSPHRASE }}
     - name: Set cargo environment variables
       shell: bash
       run: |

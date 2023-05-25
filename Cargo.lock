@@ -146,7 +146,7 @@ dependencies = [
 [[package]]
 name = "eu4save"
 version = "0.8.2"
-source = "git+https://github.com/rakaly/eu4save.git#3cda89e0205df5ab4e4d0dab5b0260a4ced49794"
+source = "git+https://github.com/rakaly/eu4save.git#04c01768d3304210b72b4357a87f5b2eb59332a5"
 dependencies = [
  "jomini",
  "libdeflater",
@@ -194,8 +194,8 @@ checksum = "fed44880c466736ef9a5c5b5facefb5ed0785676d0c02d612db14e54f0d84286"
 
 [[package]]
 name = "hoi4save"
-version = "0.3.3"
-source = "git+https://github.com/rakaly/hoi4save.git#d033a4f8e24ff63c20c5a51d2cc7e3b1307faf0a"
+version = "0.3.4"
+source = "git+https://github.com/rakaly/hoi4save.git#783d9da410d93d028874062c45019a9b3ed465ef"
 dependencies = [
  "jomini",
  "serde",
@@ -517,7 +517,7 @@ checksum = "e5464a87b239f13a63a501f2701565754bae92d243d4bb7eb12f6d57d2269bf4"
 [[package]]
 name = "vic3save"
 version = "0.1.0"
-source = "git+https://github.com/pdx-tools/pdx-tools#38684ea2194c3cc1e8f8e7a92777f132be88debe"
+source = "git+https://github.com/pdx-tools/pdx-tools#856355d0ed87f5718d9b16ced05496386c278be0"
 dependencies = [
  "jomini",
  "libdeflater",

@@ -1,3 +1,10 @@
+## v0.11.2 - 2023-05-24
+
+- Update EU4 tokens to 1.35.3
+- Update CK3 tokens to 1.9
+- Update vic3 tokens to 1.3
+- Update hoi4 melter to exclude ironman key from output
+
 ## v0.11.1 - 2023-04-18
 
 - Update EU4 tokens to 1.35

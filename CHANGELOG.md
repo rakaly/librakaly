@@ -1,3 +1,7 @@
+## v0.11.3 - 2023-05-26
+
+- Improve vic3 melt accuracy for pop_statistsics
+
 ## v0.11.2 - 2023-05-24
 
 - Update EU4 tokens to 1.35.3

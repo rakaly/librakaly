@@ -1,6 +1,6 @@
 use crate::errors::LibError;
 use ck3save::file::Ck3Binary;
-use eu4save::file::Eu4Binary;
+use eu4save::file::Eu4ParsedBinary;
 use hoi4save::file::Hoi4Binary;
 use imperator_save::file::ImperatorBinary;
 use vic3save::file::Vic3Binary;
@@ -31,7 +31,7 @@ pub trait Melter {
     fn melt(&self) -> Result<MeltedBuffer, LibError>;
 }
 
-impl<'a> Melter for &'_ Eu4Binary<'a> {
+impl<'a> Melter for &'_ Eu4ParsedBinary<'a> {
     fn melt(&self) -> Result<MeltedBuffer, LibError> {
         let melted = self
             .melter()

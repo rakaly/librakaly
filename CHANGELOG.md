@@ -1,3 +1,8 @@
+## v0.11.5 - 2023-08-29
+
+- Update to support VIC3 1.4
+- Update to support CK3 1.10
+
 ## v0.11.4 - 2023-07-10
 
 - Additional accuracy for melted vic3 output

@@ -1,3 +1,7 @@
+## v0.11.7 - 2023-10-15
+
+- Update to support HOI4 1.13 saves
+
 ## v0.11.6 - 2023-10-09
 
 - Update to support VIC3 1.4.2

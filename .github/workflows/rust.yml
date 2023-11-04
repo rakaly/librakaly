@@ -23,8 +23,8 @@ jobs:
         - build: win-msvc
           os: windows-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
       name: Clone tokens
       with:
         path: assets/
@@ -113,7 +113,7 @@ jobs:
     needs: test
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: actions/download-artifact@v3
       with:
         path: artifacts-temp

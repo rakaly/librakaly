@@ -1,3 +1,8 @@
+## v0.11.9 - 2023-11-15
+
+- Update to support CK3 1.11 saves
+- Update to support VIC3 1.5 saves
+
 ## v0.11.8 - 2023-11-06
 
 - Update to support EU4 1.36 saves

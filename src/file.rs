@@ -4,12 +4,12 @@ use ck3save::{
     Ck3File,
 };
 use eu4save::{
-    file::{Eu4FileEntry, Eu4FileEntryName, Eu4ParsedFileKind},
+    file::{Eu4FileEntry, Eu4FileEntryName},
     Eu4File,
 };
 use hoi4save::{file::Hoi4ParsedFileKind, Hoi4File};
 use imperator_save::{
-    file::{ImperatorMeta, ImperatorMetaKind, ImperatorParsedFileKind},
+    file::{ImperatorMeta, ImperatorMetaKind},
     ImperatorFile,
 };
 use vic3save::{
@@ -57,15 +57,7 @@ impl<'a> PdsFile<'a> {
                     return Ok(MeltedBuffer::Verbatim);
                 }
 
-                let mut zip_sink = Vec::new();
-                let parsed = file.parse(&mut zip_sink)?;
-                match parsed.kind() {
-                    Eu4ParsedFileKind::Text(_) => Ok(MeltedBuffer::Text {
-                        header: b"EU4txt".to_vec(),
-                        body: zip_sink,
-                    }),
-                    Eu4ParsedFileKind::Binary(bin) => bin.melt(),
-                }
+                Melter::melt(file.melter())
             }
             PdsFile::Ck3(file) => {
                 if matches!(file.encoding(), ck3save::Encoding::Text) {
@@ -93,21 +85,7 @@ impl<'a> PdsFile<'a> {
                     return Ok(MeltedBuffer::Verbatim);
                 }
 
-                let mut zip_sink = Vec::new();
-                let parsed = file.parse(&mut zip_sink)?;
-                match parsed.kind() {
-                    ImperatorParsedFileKind::Text(_) => {
-                        let mut new_header = file.header().clone();
-                        new_header.set_kind(imperator_save::SaveHeaderKind::Text);
-                        let mut out_header = Vec::new();
-                        new_header.write(&mut out_header).unwrap();
-                        Ok(MeltedBuffer::Text {
-                            header: out_header,
-                            body: zip_sink,
-                        })
-                    }
-                    ImperatorParsedFileKind::Binary(bin) => bin.melt(),
-                }
+                Melter::melt(file.melter())
             }
             PdsFile::Hoi4(file) => {
                 if matches!(file.encoding(), hoi4save::Encoding::Plaintext) {
@@ -175,15 +153,11 @@ impl<'data> PdsMeta<'data> {
     pub(crate) fn melt(&self) -> Result<MeltedBuffer, LibError> {
         match self {
             PdsMeta::Eu4(entry) => {
-                let mut zip_sink = Vec::new();
-                let parsed_entry = entry.parse(&mut zip_sink)?;
-                match parsed_entry.kind() {
-                    Eu4ParsedFileKind::Text(_) => Ok(MeltedBuffer::Text {
-                        header: Vec::new(),
-                        body: zip_sink,
-                    }),
-                    Eu4ParsedFileKind::Binary(binary) => binary.melt(),
+                if matches!(entry.encoding(), eu4save::Encoding::Text) {
+                    return Ok(MeltedBuffer::Verbatim);
                 }
+
+                Melter::melt(entry.melter())
             }
             PdsMeta::Ck3(file) => match file.kind() {
                 Ck3MetaKind::Text(x) => {
@@ -205,7 +179,7 @@ impl<'data> PdsMeta<'data> {
                         body: x.to_vec(),
                     })
                 }
-                ImperatorMetaKind::Binary(_) => file.parse()?.as_binary().unwrap().melt(),
+                ImperatorMetaKind::Binary(_) => Melter::melt(file.melter()),
             },
             PdsMeta::Vic3(file) => match file.kind() {
                 Vic3MetaData::Text(x) => {

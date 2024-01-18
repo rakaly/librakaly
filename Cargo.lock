@@ -80,7 +80,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 [[package]]
 name = "ck3save"
 version = "0.4.3"
-source = "git+https://github.com/rakaly/ck3save.git#d6a35448baaef0e4d0e2876a7dd75cf4be6df4ae"
+source = "git+https://github.com/rakaly/ck3save.git#45d6e4391f3cef32a55905005456bad9a06aa29c"
 dependencies = [
  "jomini",
  "libdeflater",
@@ -144,10 +144,11 @@ dependencies = [
 [[package]]
 name = "eu4save"
 version = "0.8.2"
-source = "git+https://github.com/rakaly/eu4save.git#10b9acd27b16b872587674b9996d1c5c256e5d14"
+source = "git+https://github.com/rakaly/eu4save.git#d124fa13876777d330fea1a9c5b55a9afcd44c13"
 dependencies = [
+ "flate2",
  "jomini",
- "libdeflater",
+ "miniz_oxide",
  "once_cell",
  "serde",
  "thiserror",
@@ -159,6 +160,16 @@ name = "fastrand"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "25cbce373ec4653f1a01a31e8a5e5ec0c622dc27ff9c4e6606eefef5cbbed4a5"
+
+[[package]]
+name = "flate2"
+version = "1.0.28"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "46303f565772937ffe1d394a4fac6f411c6013172fadde9dcdb1e147a086940e"
+dependencies = [
+ "crc32fast",
+ "miniz_oxide",
+]
 
 [[package]]
 name = "hashbrown"
@@ -184,7 +195,7 @@ dependencies = [
 [[package]]
 name = "hoi4save"
 version = "0.3.4"
-source = "git+https://github.com/rakaly/hoi4save.git#5048cdc6289c427c1004835c64df2eb97e5af2b1"
+source = "git+https://github.com/rakaly/hoi4save.git#b217bcf2a0f91fa2c7a4783c8247b9d6dabf12a5"
 dependencies = [
  "jomini",
  "serde",
@@ -194,8 +205,9 @@ dependencies = [
 [[package]]
 name = "imperator-save"
 version = "0.4.2"
-source = "git+https://github.com/rakaly/imperator-save.git#057a07cb1d6f812297b74c209bc838381d2bf085"
+source = "git+https://github.com/rakaly/imperator-save.git#6b9758be506ecef2e90f40f58a967cc2bd81f6ee"
 dependencies = [
+ "flate2",
  "jomini",
  "libdeflater",
  "serde",
@@ -221,10 +233,11 @@ checksum = "af150ab688ff2122fcef229be89cb50dd66af9e01a4ff320cc137eecc9bacc38"
 
 [[package]]
 name = "jomini"
-version = "0.24.0"
+version = "0.25.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e86b12b9bb9a94d68179ba79dc5c70067556be306636568d52860c7a5ec77e36"
+checksum = "3d8d87c05369e00bf48491985ed88cb9b2cb39bf6e26fb3896392a6f604666a4"
 dependencies = [
+ "itoa",
  "jomini_derive",
  "serde",
  "serde_json",
@@ -482,7 +495,7 @@ checksum = "3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b"
 [[package]]
 name = "vic3save"
 version = "0.1.0"
-source = "git+https://github.com/pdx-tools/pdx-tools#778b54132d12daeccf3e0e0c7aa4942ae4e4eefd"
+source = "git+https://github.com/pdx-tools/pdx-tools#ced8e18440f3a18cfa58b2aa22f460d0c3ca92c9"
 dependencies = [
  "jomini",
  "libdeflater",

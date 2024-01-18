@@ -23,7 +23,7 @@ vic3save = { git = "https://github.com/pdx-tools/pdx-tools", features = ["libdef
 thiserror = "1.0"
 
 [build-dependencies]
-cbindgen = "0.24"
+cbindgen = "0.26"
 
 [profile.release]
 strip = true

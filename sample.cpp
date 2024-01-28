@@ -33,7 +33,7 @@ rakaly::GameFile parseSave(fs::path filePath, const std::string &input) {
 
 int main(int argc, const char *argv[]) {
   if (argc != 3) {
-    std::cerr << "expected [melt/save] and one file argument\n";
+    std::cerr << "expected [meta/save] and one file argument\n";
     return 1;
   }
 
@@ -68,6 +68,6 @@ int main(int argc, const char *argv[]) {
     melt.writeData(input);
     std::cout << input;
   } else {
-    throw std::runtime_error("unrecognized command [melt/save]");
+    throw std::runtime_error("unrecognized command [meta/save]");
   }
 }

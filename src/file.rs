@@ -52,13 +52,7 @@ impl<'a> PdsFile<'a> {
 
     pub(crate) fn melt_file(&self) -> Result<MeltedBuffer, LibError> {
         match self {
-            PdsFile::Eu4(file) => {
-                if matches!(file.encoding(), eu4save::Encoding::Text) {
-                    return Ok(MeltedBuffer::Verbatim);
-                }
-
-                Melter::melt(file.melter())
-            }
+            PdsFile::Eu4(file) => Melter::melt(file.melter()),
             PdsFile::Ck3(file) => {
                 if matches!(file.encoding(), ck3save::Encoding::Text) {
                     return Ok(MeltedBuffer::Verbatim);
@@ -80,13 +74,7 @@ impl<'a> PdsFile<'a> {
                     Ck3ParsedFileKind::Binary(bin) => bin.melt(),
                 }
             }
-            PdsFile::Imperator(file) => {
-                if matches!(file.encoding(), imperator_save::Encoding::Text) {
-                    return Ok(MeltedBuffer::Verbatim);
-                }
-
-                Melter::melt(file.melter())
-            }
+            PdsFile::Imperator(file) => Melter::melt(file.melter()),
             PdsFile::Hoi4(file) => {
                 if matches!(file.encoding(), hoi4save::Encoding::Plaintext) {
                     return Ok(MeltedBuffer::Verbatim);

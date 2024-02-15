@@ -36,6 +36,10 @@ pub trait Melter {
 impl<'a> Melter for Eu4Melter<'a> {
     fn melt(mut self) -> Result<MeltedBuffer, LibError> {
         let mut out = Cursor::new(Vec::new());
+        if matches!(self.input_encoding(), eu4save::Encoding::Text) {
+            return Ok(MeltedBuffer::Verbatim);
+        }
+
         let doc = self
             .on_failed_resolve(eu4save::FailedResolveStrategy::Stringify)
             .verbatim(true)
@@ -73,10 +77,14 @@ impl<'a> Melter for &'_ Ck3Binary<'a> {
 impl<'a> Melter for ImperatorMelter<'a> {
     fn melt(mut self) -> Result<MeltedBuffer, LibError> {
         let mut out = Cursor::new(Vec::new());
+        if matches!(self.input_encoding(), imperator_save::Encoding::Text) {
+            return Ok(MeltedBuffer::Verbatim);
+        }
+
         let doc = self
-            .on_failed_resolve(eu4save::FailedResolveStrategy::Stringify)
+            .on_failed_resolve(imperator_save::FailedResolveStrategy::Stringify)
             .verbatim(true)
-            .melt(&mut out, &eu4save::EnvTokens)?;
+            .melt(&mut out, &imperator_save::EnvTokens)?;
 
         if matches!(self.input_encoding(), imperator_save::Encoding::TextZip) {
             Ok(MeltedBuffer::Text {

@@ -276,7 +276,7 @@ dependencies = [
 
 [[package]]
 name = "librakaly"
-version = "0.11.10"
+version = "0.11.11"
 dependencies = [
  "cbindgen",
  "ck3save",

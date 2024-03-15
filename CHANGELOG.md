@@ -1,3 +1,7 @@
+## v0.11.12 - 2024-03-15
+
+- Update to support HOI4 1.14 saves
+
 ## v0.11.11 - 2024-03-07
 
 - Update to support CK3 1.12 saves

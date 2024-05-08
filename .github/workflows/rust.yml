@@ -31,7 +31,7 @@ jobs:
         repository: pdx-tools/tokens
         token: ${{secrets.GH_PAT}}
     - name: Cache saves
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: assets/saves
         key: assets/saves
@@ -93,7 +93,7 @@ jobs:
           VERSION="vnightly"
         fi
         echo "version is $VERSION"
-        STAGING="librakaly-${VERSION:1}"
+        STAGING="librakaly-${VERSION:1}-${{ matrix.build }}"
         echo "STAGING DIR: $STAGING"
         mkdir $STAGING 
         if [[ "${{ matrix.os }}" = windows* ]]; then
@@ -103,7 +103,7 @@ jobs:
           find target/release -maxdepth 1 -name "librakaly.so" -o -name "librakaly.dylib" | xargs -I{} cp {} "$STAGING/"
         fi
         echo "ASSET=$STAGING" >> $GITHUB_ENV
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         path: ${{ env.ASSET }}
         name: ${{ env.ASSET }}
@@ -114,7 +114,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4
       with:
         path: artifacts-temp
     - name: Flatten artifacts
@@ -131,7 +131,7 @@ jobs:
         ls -lR ../artifacts
     - name: Create Release
       if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |

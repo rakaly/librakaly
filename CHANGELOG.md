@@ -1,3 +1,7 @@
+## v0.11.13 - 2024-05-08
+
+- Update to support EU4 1.37 saves
+
 ## v0.11.12 - 2024-03-15
 
 - Update to support HOI4 1.14 saves

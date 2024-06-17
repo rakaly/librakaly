@@ -1,19 +1,19 @@
 use crate::{errors::LibError, melter::Melter, MeltedBuffer};
 use ck3save::{
-    file::{Ck3Meta, Ck3MetaKind, Ck3ParsedFileKind},
+    file::{Ck3Meta, Ck3MetaKind},
     Ck3File,
 };
 use eu4save::{
     file::{Eu4FileEntry, Eu4FileEntryName},
     Eu4File,
 };
-use hoi4save::{file::Hoi4ParsedFileKind, Hoi4File};
+use hoi4save::Hoi4File;
 use imperator_save::{
     file::{ImperatorMeta, ImperatorMetaKind},
     ImperatorFile,
 };
 use vic3save::{
-    file::{Vic3Meta, Vic3MetaData, Vic3ParsedFileKind},
+    file::{Vic3Meta, Vic3MetaData},
     Vic3File,
 };
 
@@ -53,60 +53,10 @@ impl<'a> PdsFile<'a> {
     pub(crate) fn melt_file(&self) -> Result<MeltedBuffer, LibError> {
         match self {
             PdsFile::Eu4(file) => Melter::melt(file.melter()),
-            PdsFile::Ck3(file) => {
-                if matches!(file.encoding(), ck3save::Encoding::Text) {
-                    return Ok(MeltedBuffer::Verbatim);
-                }
-
-                let mut zip_sink = Vec::new();
-                let parsed = file.parse(&mut zip_sink)?;
-                match parsed.kind() {
-                    Ck3ParsedFileKind::Text(_) => {
-                        let mut new_header = file.header().clone();
-                        new_header.set_kind(ck3save::SaveHeaderKind::Text);
-                        let mut out_header = Vec::new();
-                        new_header.write(&mut out_header).unwrap();
-                        Ok(MeltedBuffer::Text {
-                            header: out_header,
-                            body: zip_sink,
-                        })
-                    }
-                    Ck3ParsedFileKind::Binary(bin) => bin.melt(),
-                }
-            }
+            PdsFile::Ck3(file) => Melter::melt(file.melter()),
             PdsFile::Imperator(file) => Melter::melt(file.melter()),
-            PdsFile::Hoi4(file) => {
-                if matches!(file.encoding(), hoi4save::Encoding::Plaintext) {
-                    return Ok(MeltedBuffer::Verbatim);
-                }
-
-                let parsed = file.parse()?;
-                match parsed.kind() {
-                    Hoi4ParsedFileKind::Text(_) => Ok(MeltedBuffer::Verbatim),
-                    Hoi4ParsedFileKind::Binary(bin) => bin.melt(),
-                }
-            }
-            PdsFile::Vic3(file) => {
-                if matches!(file.encoding(), vic3save::Encoding::Text) {
-                    return Ok(MeltedBuffer::Verbatim);
-                }
-
-                let mut zip_sink = Vec::new();
-                let parsed = file.parse(&mut zip_sink)?;
-                match parsed.kind() {
-                    Vic3ParsedFileKind::Text(_) => {
-                        let mut new_header = file.header().clone();
-                        new_header.set_kind(vic3save::SaveHeaderKind::Text);
-                        let mut out_header = Vec::new();
-                        new_header.write(&mut out_header).unwrap();
-                        Ok(MeltedBuffer::Text {
-                            header: out_header,
-                            body: zip_sink,
-                        })
-                    }
-                    Vic3ParsedFileKind::Binary(bin) => bin.melt(),
-                }
-            }
+            PdsFile::Hoi4(file) => Melter::melt(file.melter()),
+            PdsFile::Vic3(file) => Melter::melt(file.melter()),
         }
     }
 
@@ -156,7 +106,7 @@ impl<'data> PdsMeta<'data> {
                         body: x.to_vec(),
                     })
                 }
-                Ck3MetaKind::Binary(_) => file.parse()?.as_binary().unwrap().melt(),
+                Ck3MetaKind::Binary(_) => Melter::melt(file.melter()),
             },
             PdsMeta::Imperator(file) => match file.kind() {
                 ImperatorMetaKind::Text(x) => {
@@ -178,7 +128,7 @@ impl<'data> PdsMeta<'data> {
                         body: x.to_vec(),
                     })
                 }
-                Vic3MetaData::Binary(_) => file.parse()?.as_binary().unwrap().melt(),
+                Vic3MetaData::Binary(_) => Melter::melt(file.melter()),
             },
         }
     }

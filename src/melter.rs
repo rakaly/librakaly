@@ -1,11 +1,11 @@
 use std::io::Cursor;
 
 use crate::errors::LibError;
-use ck3save::file::Ck3Binary;
+use ck3save::Ck3Melter;
 use eu4save::Eu4Melter;
-use hoi4save::file::Hoi4Binary;
+use hoi4save::Hoi4Melter;
 use imperator_save::ImperatorMelter;
-use vic3save::file::Vic3Binary;
+use vic3save::Vic3Melter;
 
 pub enum MeltedBufferResult {
     Ok(MeltedBuffer),
@@ -59,18 +59,29 @@ impl<'a> Melter for Eu4Melter<'a> {
     }
 }
 
-impl<'a> Melter for &'_ Ck3Binary<'a> {
-    fn melt(self) -> Result<MeltedBuffer, LibError> {
-        let melted = self
-            .melter()
+impl<'a> Melter for Ck3Melter<'a> {
+    fn melt(mut self) -> Result<MeltedBuffer, LibError> {
+        let mut out = Cursor::new(Vec::new());
+        if matches!(self.input_encoding(), ck3save::Encoding::Text) {
+            return Ok(MeltedBuffer::Verbatim);
+        }
+
+        let doc = self
             .on_failed_resolve(ck3save::FailedResolveStrategy::Stringify)
             .verbatim(true)
-            .melt(&ck3save::EnvTokens)?;
+            .melt(&mut out, &ck3save::EnvTokens)?;
 
-        Ok(MeltedBuffer::Binary {
-            unknown_tokens: !melted.unknown_tokens().is_empty(),
-            body: melted.into_data(),
-        })
+        if matches!(self.input_encoding(), ck3save::Encoding::TextZip) {
+            Ok(MeltedBuffer::Text {
+                header: Vec::new(),
+                body: out.into_inner(),
+            })
+        } else {
+            Ok(MeltedBuffer::Binary {
+                body: out.into_inner(),
+                unknown_tokens: !doc.unknown_tokens().is_empty(),
+            })
+        }
     }
 }
 
@@ -100,32 +111,47 @@ impl<'a> Melter for ImperatorMelter<'a> {
     }
 }
 
-impl<'a> Melter for &'_ Hoi4Binary<'a> {
-    fn melt(self) -> Result<MeltedBuffer, LibError> {
-        let melted = self
-            .melter()
+impl<'a> Melter for Hoi4Melter<'a> {
+    fn melt(mut self) -> Result<MeltedBuffer, LibError> {
+        let mut out = Cursor::new(Vec::new());
+        if matches!(self.input_encoding(), hoi4save::Encoding::Plaintext) {
+            return Ok(MeltedBuffer::Verbatim);
+        }
+
+        let doc = self
             .on_failed_resolve(hoi4save::FailedResolveStrategy::Stringify)
             .verbatim(true)
-            .melt(&hoi4save::EnvTokens)?;
+            .melt(&mut out, &hoi4save::EnvTokens)?;
 
         Ok(MeltedBuffer::Binary {
-            unknown_tokens: !melted.unknown_tokens().is_empty(),
-            body: melted.into_data(),
+            body: out.into_inner(),
+            unknown_tokens: !doc.unknown_tokens().is_empty(),
         })
     }
 }
 
-impl<'a> Melter for &'_ Vic3Binary<'a> {
-    fn melt(self) -> Result<MeltedBuffer, LibError> {
-        let melted = self
-            .melter()
+impl<'a> Melter for Vic3Melter<'a> {
+    fn melt(mut self) -> Result<MeltedBuffer, LibError> {
+        let mut out = Cursor::new(Vec::new());
+        if matches!(self.input_encoding(), vic3save::Encoding::Text) {
+            return Ok(MeltedBuffer::Verbatim);
+        }
+
+        let doc = self
             .on_failed_resolve(vic3save::FailedResolveStrategy::Stringify)
             .verbatim(true)
-            .melt(&vic3save::EnvTokens)?;
+            .melt(&mut out, &vic3save::EnvTokens)?;
 
-        Ok(MeltedBuffer::Binary {
-            unknown_tokens: !melted.unknown_tokens().is_empty(),
-            body: melted.into_data(),
-        })
+        if matches!(self.input_encoding(), vic3save::Encoding::TextZip) {
+            Ok(MeltedBuffer::Text {
+                header: Vec::new(),
+                body: out.into_inner(),
+            })
+        } else {
+            Ok(MeltedBuffer::Binary {
+                body: out.into_inner(),
+                unknown_tokens: !doc.unknown_tokens().is_empty(),
+            })
+        }
     }
 }

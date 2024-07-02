@@ -1,3 +1,8 @@
+## v0.11.14 - 2024-07-02
+
+- All games now use a constant memory melter
+- Update to support VIC3 1.7 saves
+
 ## v0.11.13 - 2024-05-08
 
 - Update to support EU4 1.37 saves

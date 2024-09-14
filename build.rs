@@ -1,17 +1,13 @@
-use std::env;
 use std::path::Path;
 
 fn main() {
-    if env::var("EU4_IRONMAN_TOKENS").is_err() {
-        panic!("librakaly needs to be built with EU4_IRONMAN_TOKENS specified")
-    }
-
-    if env::var("CK3_IRONMAN_TOKENS").is_err() {
-        panic!("librakaly needs to be built with CK3_IRONMAN_TOKENS specified")
-    }
-
-    if env::var("IMPERATOR_TOKENS").is_err() {
-        panic!("librakaly needs to be built with IMPERATOR_TOKENS specified")
+    std::fs::create_dir_all("assets/tokens").expect("to create tokens directory");
+    for game in ["ck3", "hoi4", "eu4", "imperator", "vic3"] {
+        let fp = format!("assets/tokens/{game}.txt");
+        let p = std::path::Path::new(&fp);
+        if !p.exists() {
+            std::fs::write(p, "").expect("to write file");
+        }
     }
 
     let crate_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();

@@ -1,10 +1,15 @@
-use std::io::Cursor;
-
-use crate::errors::LibError;
+use crate::{
+    errors::LibError,
+    tokens::{
+        ck3_tokens_resolver, eu4_tokens_resolver, hoi4_tokens_resolver, imperator_tokens_resolver,
+        vic3_tokens_resolver,
+    },
+};
 use ck3save::Ck3Melter;
 use eu4save::Eu4Melter;
 use hoi4save::Hoi4Melter;
 use imperator_save::ImperatorMelter;
+use std::io::Cursor;
 use vic3save::Vic3Melter;
 
 pub enum MeltedBufferResult {
@@ -43,7 +48,7 @@ impl<'a> Melter for Eu4Melter<'a> {
         let doc = self
             .on_failed_resolve(eu4save::FailedResolveStrategy::Stringify)
             .verbatim(true)
-            .melt(&mut out, &eu4save::EnvTokens)?;
+            .melt(&mut out, eu4_tokens_resolver())?;
 
         if self.input_encoding().is_text() {
             Ok(MeltedBuffer::Text {
@@ -69,7 +74,7 @@ impl<'a> Melter for Ck3Melter<'a> {
         let doc = self
             .on_failed_resolve(ck3save::FailedResolveStrategy::Stringify)
             .verbatim(true)
-            .melt(&mut out, &ck3save::EnvTokens)?;
+            .melt(&mut out, &ck3_tokens_resolver())?;
 
         if matches!(self.input_encoding(), ck3save::Encoding::TextZip) {
             Ok(MeltedBuffer::Text {
@@ -95,7 +100,7 @@ impl<'a> Melter for ImperatorMelter<'a> {
         let doc = self
             .on_failed_resolve(imperator_save::FailedResolveStrategy::Stringify)
             .verbatim(true)
-            .melt(&mut out, &imperator_save::EnvTokens)?;
+            .melt(&mut out, &imperator_tokens_resolver())?;
 
         if matches!(self.input_encoding(), imperator_save::Encoding::TextZip) {
             Ok(MeltedBuffer::Text {
@@ -121,7 +126,7 @@ impl<'a> Melter for Hoi4Melter<'a> {
         let doc = self
             .on_failed_resolve(hoi4save::FailedResolveStrategy::Stringify)
             .verbatim(true)
-            .melt(&mut out, &hoi4save::EnvTokens)?;
+            .melt(&mut out, &hoi4_tokens_resolver())?;
 
         Ok(MeltedBuffer::Binary {
             body: out.into_inner(),
@@ -140,7 +145,7 @@ impl<'a> Melter for Vic3Melter<'a> {
         let doc = self
             .on_failed_resolve(vic3save::FailedResolveStrategy::Stringify)
             .verbatim(true)
-            .melt(&mut out, &vic3save::EnvTokens)?;
+            .melt(&mut out, &vic3_tokens_resolver())?;
 
         if matches!(self.input_encoding(), vic3save::Encoding::TextZip) {
             Ok(MeltedBuffer::Text {

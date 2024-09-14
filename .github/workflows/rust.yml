@@ -38,16 +38,6 @@ jobs:
       with:
         path: assets/saves
         key: assets/saves
-    - name: Set cargo environment variables
-      shell: bash
-      run: |
-        echo "EU4_IRONMAN_TOKENS=$current_dir/assets/tokens/eu4.txt" >> $GITHUB_ENV
-        echo "CK3_IRONMAN_TOKENS=$current_dir/assets/tokens/ck3.txt" >> $GITHUB_ENV
-        echo "IMPERATOR_TOKENS=$current_dir/assets/tokens/imperator.txt" >> $GITHUB_ENV
-        echo "HOI4_IRONMAN_TOKENS=$current_dir/assets/tokens/hoi4.txt" >> $GITHUB_ENV
-        echo "VIC3_IRONMAN_TOKENS=$current_dir/assets/tokens/vic3.txt" >> $GITHUB_ENV
-      env:
-        current_dir: ${{ github.workspace }}
     - name: Build
       run: cargo build --all --verbose --release
     - name: create save assets directory

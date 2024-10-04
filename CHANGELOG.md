@@ -1,3 +1,7 @@
+## v0.11.15 - 2024-10-04
+
+- Update to support CK3 1.13 saves
+
 ## v0.11.14 - 2024-07-02
 
 - All games now use a constant memory melter

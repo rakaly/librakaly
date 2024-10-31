@@ -1,3 +1,7 @@
+## v0.11.16 - 2024-10-31
+
+- Support melting CK3 compressed metadata
+
 ## v0.11.15 - 2024-10-04
 
 - Update to support CK3 1.13 saves

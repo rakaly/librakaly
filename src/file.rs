@@ -98,7 +98,7 @@ impl<'data> PdsMeta<'data> {
                 Melter::melt(entry.melter())
             }
             PdsMeta::Ck3(file) => match file.kind() {
-                Ck3MetaKind::Text(x) => {
+                Ck3MetaKind::InlinedText(x) => {
                     let mut out_header = Vec::new();
                     file.header().write(&mut out_header).unwrap();
                     Ok(MeltedBuffer::Text {
@@ -106,7 +106,7 @@ impl<'data> PdsMeta<'data> {
                         body: x.to_vec(),
                     })
                 }
-                Ck3MetaKind::Binary(_) => Melter::melt(file.melter()),
+                _ => Melter::melt(file.melter()),
             },
             PdsMeta::Imperator(file) => match file.kind() {
                 ImperatorMetaKind::Text(x) => {

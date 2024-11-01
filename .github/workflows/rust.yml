@@ -101,6 +101,12 @@ jobs:
         path: ${{ env.ASSET }}
         name: ${{ env.ASSET }}
         if-no-files-found: error
+    - uses: actions/upload-artifact@v4
+      with:
+        path: target/rakaly.h
+        name: rakaly.h
+        if-no-files-found: error
+        overwrite: true
 
   release:
     needs: test
@@ -115,11 +121,7 @@ jobs:
         mkdir artifacts
         cd artifacts-temp
         for i in *; do
-          if [[ "$i" = *windows* ]]; then
-            7z a "../artifacts/$(basename "$i").zip" "$i"
-          else
-            tar czf "../artifacts/$(basename "$i").tar.gz" "$i"
-          fi
+          tar czf "../artifacts/$(basename "$i").tar.gz" "$i"
         done
         ls -lR ../artifacts
     - name: Create Release

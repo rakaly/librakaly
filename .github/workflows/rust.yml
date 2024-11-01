@@ -104,7 +104,7 @@ jobs:
     - uses: actions/upload-artifact@v4
       with:
         path: target/rakaly.h
-        name: target/rakaly.h
+        name: rakaly.h
         if-no-files-found: error
 
   release:

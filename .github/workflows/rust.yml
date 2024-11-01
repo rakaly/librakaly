@@ -103,10 +103,10 @@ jobs:
         if-no-files-found: error
     - uses: actions/upload-artifact@v4
       with:
-        if: matrix.build == 'linux'
         path: target/rakaly.h
         name: rakaly.h
         if-no-files-found: error
+        overwrite: true
 
   release:
     needs: test

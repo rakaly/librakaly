@@ -1,3 +1,8 @@
+## v0.11.17 - 2024-11-21
+
+- Update to support melting Vic3 1.8 saves
+- Update to support melting HOI4 1.15 saves
+
 ## v0.11.16 - 2024-10-31
 
 - Support melting CK3 compressed metadata

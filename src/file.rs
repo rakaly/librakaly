@@ -30,7 +30,7 @@ pub enum PdsFile<'a> {
     Vic3(Vic3File<'a>),
 }
 
-impl<'a> PdsFile<'a> {
+impl PdsFile<'_> {
     pub(crate) fn meta(&self) -> Option<PdsMeta> {
         match self {
             PdsFile::Eu4(file) => {
@@ -87,7 +87,7 @@ pub enum PdsMeta<'data> {
     Vic3(Vic3Meta<'data>),
 }
 
-impl<'data> PdsMeta<'data> {
+impl PdsMeta<'_> {
     pub(crate) fn melt(&self) -> Result<MeltedBuffer, LibError> {
         match self {
             PdsMeta::Eu4(entry) => {

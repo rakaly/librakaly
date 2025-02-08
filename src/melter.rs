@@ -38,7 +38,7 @@ pub trait Melter {
     fn melt(self) -> Result<MeltedBuffer, LibError>;
 }
 
-impl<'a> Melter for Eu4Melter<'a> {
+impl Melter for Eu4Melter<'_> {
     fn melt(mut self) -> Result<MeltedBuffer, LibError> {
         let mut out = Cursor::new(Vec::new());
         if matches!(self.input_encoding(), eu4save::Encoding::Text) {
@@ -64,7 +64,7 @@ impl<'a> Melter for Eu4Melter<'a> {
     }
 }
 
-impl<'a> Melter for Ck3Melter<'a> {
+impl Melter for Ck3Melter<'_> {
     fn melt(mut self) -> Result<MeltedBuffer, LibError> {
         let mut out = Cursor::new(Vec::new());
         if matches!(self.input_encoding(), ck3save::Encoding::Text) {
@@ -90,7 +90,7 @@ impl<'a> Melter for Ck3Melter<'a> {
     }
 }
 
-impl<'a> Melter for ImperatorMelter<'a> {
+impl Melter for ImperatorMelter<'_> {
     fn melt(mut self) -> Result<MeltedBuffer, LibError> {
         let mut out = Cursor::new(Vec::new());
         if matches!(self.input_encoding(), imperator_save::Encoding::Text) {
@@ -116,7 +116,7 @@ impl<'a> Melter for ImperatorMelter<'a> {
     }
 }
 
-impl<'a> Melter for Hoi4Melter<'a> {
+impl Melter for Hoi4Melter<'_> {
     fn melt(mut self) -> Result<MeltedBuffer, LibError> {
         let mut out = Cursor::new(Vec::new());
         if matches!(self.input_encoding(), hoi4save::Encoding::Plaintext) {
@@ -135,7 +135,7 @@ impl<'a> Melter for Hoi4Melter<'a> {
     }
 }
 
-impl<'a> Melter for Vic3Melter<'a> {
+impl Melter for Vic3Melter<'_> {
     fn melt(mut self) -> Result<MeltedBuffer, LibError> {
         let mut out = Cursor::new(Vec::new());
         if matches!(self.input_encoding(), vic3save::Encoding::Text) {

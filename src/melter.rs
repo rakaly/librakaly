@@ -5,12 +5,12 @@ use crate::{
         vic3_tokens_resolver,
     },
 };
-use ck3save::Ck3Melter;
-use eu4save::Eu4Melter;
-use hoi4save::Hoi4Melter;
-use imperator_save::ImperatorMelter;
+use ck3save::file::Ck3SliceFile;
+use eu4save::file::Eu4SliceFile;
+use hoi4save::file::Hoi4SliceFile;
+use imperator_save::file::ImperatorSliceFile;
 use std::io::Cursor;
-use vic3save::Vic3Melter;
+use vic3save::file::Vic3SliceFile;
 
 pub enum MeltedBufferResult {
     Ok(MeltedBuffer),
@@ -38,19 +38,19 @@ pub trait Melter {
     fn melt(self) -> Result<MeltedBuffer, LibError>;
 }
 
-impl Melter for Eu4Melter<'_> {
-    fn melt(mut self) -> Result<MeltedBuffer, LibError> {
-        let mut out = Cursor::new(Vec::new());
-        if matches!(self.input_encoding(), eu4save::Encoding::Text) {
+impl Melter for &'_ Eu4SliceFile<'_> {
+    fn melt(self) -> Result<MeltedBuffer, LibError> {
+        if matches!(self.encoding(), eu4save::Encoding::Text) {
             return Ok(MeltedBuffer::Verbatim);
         }
 
-        let doc = self
-            .on_failed_resolve(eu4save::FailedResolveStrategy::Stringify)
+        let mut out = Cursor::new(Vec::new());
+        let options = eu4save::MeltOptions::new()
             .verbatim(true)
-            .melt(&mut out, eu4_tokens_resolver())?;
+            .on_failed_resolve(eu4save::FailedResolveStrategy::Stringify);
+        let doc = self.melt(options, eu4_tokens_resolver(), &mut out)?;
 
-        if self.input_encoding().is_text() {
+        if self.encoding().is_text() {
             Ok(MeltedBuffer::Text {
                 header: Vec::new(),
                 body: out.into_inner(),
@@ -64,19 +64,54 @@ impl Melter for Eu4Melter<'_> {
     }
 }
 
-impl Melter for Ck3Melter<'_> {
-    fn melt(mut self) -> Result<MeltedBuffer, LibError> {
+impl Melter for &'_ Ck3SliceFile<'_> {
+    fn melt(self) -> Result<MeltedBuffer, LibError> {
         let mut out = Cursor::new(Vec::new());
-        if matches!(self.input_encoding(), ck3save::Encoding::Text) {
+        let options = ck3save::MeltOptions::new()
+            .verbatim(true)
+            .on_failed_resolve(ck3save::FailedResolveStrategy::Stringify);
+        match self.kind() {
+            ck3save::file::Ck3SliceFileKind::Text(_) => Ok(MeltedBuffer::Verbatim),
+            ck3save::file::Ck3SliceFileKind::Binary(binary) => {
+                let doc = binary
+                    .clone()
+                    .melt(options, ck3_tokens_resolver(), &mut out)?;
+                Ok(MeltedBuffer::Binary {
+                    body: out.into_inner(),
+                    unknown_tokens: !doc.unknown_tokens().is_empty(),
+                })
+            }
+            ck3save::file::Ck3SliceFileKind::Zip(zip) => {
+                let doc = zip.melt(options, ck3_tokens_resolver(), &mut out)?;
+                if matches!(self.encoding(), ck3save::Encoding::TextZip) {
+                    Ok(MeltedBuffer::Text {
+                        header: Vec::new(),
+                        body: out.into_inner(),
+                    })
+                } else {
+                    Ok(MeltedBuffer::Binary {
+                        body: out.into_inner(),
+                        unknown_tokens: !doc.unknown_tokens().is_empty(),
+                    })
+                }
+            }
+        }
+    }
+}
+
+impl Melter for &'_ ImperatorSliceFile<'_> {
+    fn melt(self) -> Result<MeltedBuffer, LibError> {
+        let mut out = Cursor::new(Vec::new());
+        if matches!(self.encoding(), imperator_save::Encoding::Text) {
             return Ok(MeltedBuffer::Verbatim);
         }
 
-        let doc = self
-            .on_failed_resolve(ck3save::FailedResolveStrategy::Stringify)
+        let options = imperator_save::MeltOptions::new()
             .verbatim(true)
-            .melt(&mut out, &ck3_tokens_resolver())?;
+            .on_failed_resolve(imperator_save::FailedResolveStrategy::Stringify);
+        let doc = self.melt(options, imperator_tokens_resolver(), &mut out)?;
 
-        if matches!(self.input_encoding(), ck3save::Encoding::TextZip) {
+        if matches!(self.encoding(), imperator_save::Encoding::TextZip) {
             Ok(MeltedBuffer::Text {
                 header: Vec::new(),
                 body: out.into_inner(),
@@ -90,43 +125,17 @@ impl Melter for Ck3Melter<'_> {
     }
 }
 
-impl Melter for ImperatorMelter<'_> {
-    fn melt(mut self) -> Result<MeltedBuffer, LibError> {
+impl Melter for &'_ Hoi4SliceFile<'_> {
+    fn melt(self) -> Result<MeltedBuffer, LibError> {
         let mut out = Cursor::new(Vec::new());
-        if matches!(self.input_encoding(), imperator_save::Encoding::Text) {
+        if matches!(self.encoding(), hoi4save::Encoding::Plaintext) {
             return Ok(MeltedBuffer::Verbatim);
         }
 
-        let doc = self
-            .on_failed_resolve(imperator_save::FailedResolveStrategy::Stringify)
+        let options = hoi4save::MeltOptions::new()
             .verbatim(true)
-            .melt(&mut out, &imperator_tokens_resolver())?;
-
-        if matches!(self.input_encoding(), imperator_save::Encoding::TextZip) {
-            Ok(MeltedBuffer::Text {
-                header: Vec::new(),
-                body: out.into_inner(),
-            })
-        } else {
-            Ok(MeltedBuffer::Binary {
-                body: out.into_inner(),
-                unknown_tokens: !doc.unknown_tokens().is_empty(),
-            })
-        }
-    }
-}
-
-impl Melter for Hoi4Melter<'_> {
-    fn melt(mut self) -> Result<MeltedBuffer, LibError> {
-        let mut out = Cursor::new(Vec::new());
-        if matches!(self.input_encoding(), hoi4save::Encoding::Plaintext) {
-            return Ok(MeltedBuffer::Verbatim);
-        }
-
-        let doc = self
-            .on_failed_resolve(hoi4save::FailedResolveStrategy::Stringify)
-            .verbatim(true)
-            .melt(&mut out, &hoi4_tokens_resolver())?;
+            .on_failed_resolve(hoi4save::FailedResolveStrategy::Stringify);
+        let doc = self.melt(options, hoi4_tokens_resolver(), &mut out)?;
 
         Ok(MeltedBuffer::Binary {
             body: out.into_inner(),
@@ -135,19 +144,19 @@ impl Melter for Hoi4Melter<'_> {
     }
 }
 
-impl Melter for Vic3Melter<'_> {
-    fn melt(mut self) -> Result<MeltedBuffer, LibError> {
+impl Melter for &'_ Vic3SliceFile<'_> {
+    fn melt(self) -> Result<MeltedBuffer, LibError> {
         let mut out = Cursor::new(Vec::new());
-        if matches!(self.input_encoding(), vic3save::Encoding::Text) {
+        if matches!(self.encoding(), vic3save::Encoding::Text) {
             return Ok(MeltedBuffer::Verbatim);
         }
 
-        let doc = self
-            .on_failed_resolve(vic3save::FailedResolveStrategy::Stringify)
+        let options = vic3save::MeltOptions::new()
             .verbatim(true)
-            .melt(&mut out, &vic3_tokens_resolver())?;
+            .on_failed_resolve(vic3save::FailedResolveStrategy::Stringify);
+        let doc = self.melt(options, vic3_tokens_resolver(), &mut out)?;
 
-        if matches!(self.input_encoding(), vic3save::Encoding::TextZip) {
+        if matches!(self.encoding(), vic3save::Encoding::TextZip) {
             Ok(MeltedBuffer::Text {
                 header: Vec::new(),
                 body: out.into_inner(),

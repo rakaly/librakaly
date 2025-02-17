@@ -227,7 +227,9 @@ pub unsafe extern "C" fn rakaly_free_file(res: *mut PdsFile) {
 ///
 /// - Must pass in a valid pointer to a `PdsFileResult`
 #[no_mangle]
-pub unsafe extern "C" fn rakaly_file_value(ptr: *mut PdsFileResult<'static>) -> *mut PdsFile<'static> {
+pub unsafe extern "C" fn rakaly_file_value(
+    ptr: *mut PdsFileResult<'static>,
+) -> *mut PdsFile<'static> {
     if ptr.is_null() {
         return std::ptr::null_mut();
     }

@@ -1,3 +1,8 @@
+## v0.11.18 - 2025-03-12
+
+- Update to support HOI4 1.16.0 saves
+- Update to support CK3 1.14.3 saves
+
 ## v0.11.17 - 2024-11-21
 
 - Update to support melting Vic3 1.8 saves

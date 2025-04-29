@@ -1,3 +1,8 @@
+## v0.11.20 - 2025-04-28
+
+- Update to support CK3 1.16.0 saves
+- Bumb linux minimum glibc version to match Ubuntu 22.04's
+
 ## v0.11.19 - 2025-03-27
 
 - Update to support CK3 1.15.0 saves

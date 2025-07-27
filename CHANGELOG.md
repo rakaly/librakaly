@@ -1,3 +1,7 @@
+## v0.11.22 - 2025-07-26
+
+- Update to support melting Vic3 inlined metadata
+
 ## v0.11.21 - 2025-06-20
 
 - Update to support Vic3 1.9.0 saves

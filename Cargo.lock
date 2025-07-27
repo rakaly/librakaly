@@ -684,7 +684,7 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 [[package]]
 name = "vic3save"
 version = "0.1.0"
-source = "git+https://github.com/pdx-tools/pdx-tools#5ed0e2b82ff77ca7449a476dfefc047a87e49554"
+source = "git+https://github.com/pdx-tools/pdx-tools#4d4ff92905ed4e346efd08420a91e6dfaa4adb9c"
 dependencies = [
  "flate2",
  "getrandom 0.2.15",

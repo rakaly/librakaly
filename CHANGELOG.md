@@ -1,7 +1,7 @@
 ## v0.11.23 - 2025-10-02
 
 - Update to support Vic3 1.10 saves
-- Update to support CK3 1.16 saves
+- Update to support CK3 1.17 saves
 
 ## v0.11.22 - 2025-07-26
 

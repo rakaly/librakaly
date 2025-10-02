@@ -28,7 +28,7 @@ pub enum PdsFile<'a> {
 }
 
 impl PdsFile<'_> {
-    pub(crate) fn meta(&self) -> Option<PdsMeta> {
+    pub(crate) fn meta(&self) -> Option<PdsMeta<'_>> {
         match self {
             PdsFile::Eu4(file) => {
                 let eu4save::file::Eu4SliceFileKind::Zip(zip) = file.kind() else {

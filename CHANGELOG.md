@@ -1,3 +1,7 @@
+## v0.11.24 - 2025-10-05
+
+- Update to support Vic3 1.10.4 saves
+
 ## v0.11.23 - 2025-10-02
 
 - Update to support Vic3 1.10 saves

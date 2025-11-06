@@ -1,3 +1,8 @@
+## v0.12.0 - 2025-11-05
+
+- Add EU5 support
+- Update to support CK3 1.18
+
 ## v0.11.24 - 2025-10-05
 
 - Update to support Vic3 1.10.4 saves

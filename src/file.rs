@@ -4,12 +4,14 @@ use crate::{
     errors::LibError,
     melter::Melter,
     tokens::{
-        ck3_tokens_resolver, eu4_tokens_resolver, imperator_tokens_resolver, vic3_tokens_resolver,
+        ck3_tokens_resolver, eu4_tokens_resolver, eu5_tokens_resolver, imperator_tokens_resolver,
+        vic3_tokens_resolver,
     },
     MeltedBuffer,
 };
 use ck3save::file::Ck3SliceFile;
 use eu4save::file::{Eu4SliceFile, Eu4Zip};
+use eu5save::Eu5File;
 use hoi4save::file::Hoi4SliceFile;
 use imperator_save::file::{ImperatorSliceFile, ImperatorSliceFileKind};
 use vic3save::file::{Vic3SliceFile, Vic3SliceFileKind};
@@ -25,6 +27,7 @@ pub enum PdsFile<'a> {
     Imperator(ImperatorSliceFile<'a>),
     Hoi4(Hoi4SliceFile<'a>),
     Vic3(Vic3SliceFile<'a>),
+    Eu5(Eu5File<&'a [u8]>),
 }
 
 impl PdsFile<'_> {
@@ -41,6 +44,7 @@ impl PdsFile<'_> {
             PdsFile::Imperator(file) => Some(PdsMeta::Imperator(file.clone())),
             PdsFile::Hoi4(_) => None,
             PdsFile::Vic3(file) => Some(PdsMeta::Vic3(file.clone())),
+            PdsFile::Eu5(file) => Some(PdsMeta::Eu5(file.clone())),
         }
     }
 
@@ -51,6 +55,7 @@ impl PdsFile<'_> {
             PdsFile::Imperator(file) => Melter::melt(file),
             PdsFile::Hoi4(file) => Melter::melt(file),
             PdsFile::Vic3(file) => Melter::melt(file),
+            PdsFile::Eu5(file) => Melter::melt(file),
         }
     }
 
@@ -70,6 +75,7 @@ impl PdsFile<'_> {
                 file.encoding(),
                 vic3save::Encoding::Binary | vic3save::Encoding::BinaryZip
             ),
+            PdsFile::Eu5(file) => file.header().kind().is_binary(),
         }
     }
 }
@@ -79,6 +85,7 @@ pub enum PdsMeta<'data> {
     Ck3(Ck3SliceFile<'data>),
     Imperator(ImperatorSliceFile<'data>),
     Vic3(Vic3SliceFile<'data>),
+    Eu5(Eu5File<&'data [u8]>),
 }
 
 impl PdsMeta<'_> {
@@ -200,6 +207,21 @@ impl PdsMeta<'_> {
                     }
                 }
             },
+            PdsMeta::Eu5(file) => {
+                let options = eu5save::MeltOptions::new().verbatim(true);
+                let mut output = Cursor::new(Vec::new());
+
+                match file.meta() {
+                    eu5save::Eu5MetaKind::Text(_) => Ok(MeltedBuffer::Verbatim),
+                    eu5save::Eu5MetaKind::Binary(mut bin) => {
+                        bin.melt(options, eu5_tokens_resolver(), &mut output)?;
+                        Ok(MeltedBuffer::Binary {
+                            body: output.into_inner(),
+                            unknown_tokens: false,
+                        })
+                    }
+                }
+            }
         }
     }
 }

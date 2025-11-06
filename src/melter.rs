@@ -1,12 +1,13 @@
 use crate::{
     errors::LibError,
     tokens::{
-        ck3_tokens_resolver, eu4_tokens_resolver, hoi4_tokens_resolver, imperator_tokens_resolver,
-        vic3_tokens_resolver,
+        ck3_tokens_resolver, eu4_tokens_resolver, eu5_tokens_resolver, hoi4_tokens_resolver,
+        imperator_tokens_resolver, vic3_tokens_resolver,
     },
 };
 use ck3save::file::Ck3SliceFile;
 use eu4save::file::Eu4SliceFile;
+use eu5save::Eu5File;
 use hoi4save::file::Hoi4SliceFile;
 use imperator_save::file::ImperatorSliceFile;
 use std::io::Cursor;
@@ -167,5 +168,24 @@ impl Melter for &'_ Vic3SliceFile<'_> {
                 unknown_tokens: !doc.unknown_tokens().is_empty(),
             })
         }
+    }
+}
+
+impl Melter for &'_ Eu5File<&'_ [u8]> {
+    fn melt(self) -> Result<MeltedBuffer, LibError> {
+        if !self.header().kind().is_binary() {
+            return Ok(MeltedBuffer::Verbatim);
+        }
+
+        let mut out = Cursor::new(Vec::new());
+        let options = eu5save::MeltOptions::new()
+            .verbatim(true)
+            .on_failed_resolve(eu5save::FailedResolveStrategy::Stringify);
+        let doc = self.melt(options, eu5_tokens_resolver(), &mut out)?;
+
+        Ok(MeltedBuffer::Binary {
+            body: out.into_inner(),
+            unknown_tokens: !doc.unknown_tokens().is_empty(),
+        })
     }
 }

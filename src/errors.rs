@@ -17,6 +17,9 @@ pub enum LibError {
     #[error("vic3 error: {0}")]
     Vic3(#[from] vic3save::Vic3Error),
 
+    #[error("eu5 error: {0}")]
+    Eu5(#[from] eu5save::Eu5Error),
+
     #[error("panic! Error message may be on stdout/stderr")]
     Panic,
 }

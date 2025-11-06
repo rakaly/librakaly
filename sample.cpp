@@ -26,6 +26,8 @@ rakaly::GameFile parseSave(fs::path filePath, const std::string &input) {
     return rakaly::parseImperator(input);
   } else if (filePath.extension() == ".v3") {
     return rakaly::parseVic3(input);
+  } else if (filePath.extension() == ".eu5") {
+    return rakaly::parseEu5(input);
   } else {
     throw std::runtime_error("unrecognized file extension");
   }

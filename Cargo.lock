@@ -72,9 +72,30 @@ checksum = "5c8214115b7bf84099f1309324e63141d4c5d7cc26862f97a0a857dbefe165bd"
 
 [[package]]
 name = "bumpalo"
-version = "3.17.0"
+version = "3.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1628fb46dfa0b37568d12e5edd512553eccf6a22a78e8bde00bb4aed84d5bdbf"
+checksum = "46c5e41b57b8bba42a04676d81cb89e9ee8e859a1a66f80a5a72e1cb76b34d43"
+
+[[package]]
+name = "bumpalo-serde"
+version = "0.1.0"
+source = "git+https://github.com/pdx-tools/pdx-tools#213a0473be71fd35ca2a1c281ab5c6954fef2322"
+dependencies = [
+ "bumpalo",
+ "bumpalo-serde-derive",
+ "serde",
+]
+
+[[package]]
+name = "bumpalo-serde-derive"
+version = "0.1.0"
+source = "git+https://github.com/pdx-tools/pdx-tools#213a0473be71fd35ca2a1c281ab5c6954fef2322"
+dependencies = [
+ "bumpalo",
+ "quote",
+ "serde",
+ "syn",
+]
 
 [[package]]
 name = "cbindgen"
@@ -191,6 +212,20 @@ name = "eu4save"
 version = "0.8.2"
 source = "git+https://github.com/rakaly/eu4save.git#88de44765daffb82efd8e6bf90a1309ab5eaa44b"
 dependencies = [
+ "flate2",
+ "jomini",
+ "rawzip",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
+name = "eu5save"
+version = "0.1.0"
+source = "git+https://github.com/pdx-tools/pdx-tools#213a0473be71fd35ca2a1c281ab5c6954fef2322"
+dependencies = [
+ "bumpalo",
+ "bumpalo-serde",
  "flate2",
  "jomini",
  "rawzip",
@@ -353,6 +388,7 @@ dependencies = [
  "cbindgen",
  "ck3save",
  "eu4save",
+ "eu5save",
  "hoi4save",
  "imperator-save",
  "libc",
@@ -684,7 +720,7 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 [[package]]
 name = "vic3save"
 version = "0.1.0"
-source = "git+https://github.com/pdx-tools/pdx-tools#72f0965ef3172c67c7d0dd2ca5f3a4c6d0840570"
+source = "git+https://github.com/pdx-tools/pdx-tools#213a0473be71fd35ca2a1c281ab5c6954fef2322"
 dependencies = [
  "flate2",
  "getrandom 0.2.15",

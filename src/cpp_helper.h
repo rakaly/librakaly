@@ -118,6 +118,13 @@ GameFile parseVic3(const std::string &data) {
   return GameFile(file);
 }
 
+GameFile parseEu5(const std::string &data) {
+  PdsFileResult *file_result = rakaly_eu5_file(data.c_str(), data.length());
+  unwrapError(rakaly_file_error(file_result));
+  PdsFile *file = rakaly_file_value(file_result);
+  return GameFile(file);
+}
+
 } // namespace rakaly
 
 #endif

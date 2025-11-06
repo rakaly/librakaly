@@ -20,6 +20,7 @@ imperator-save = { git = "https://github.com/rakaly/imperator-save.git" }
 ck3save = { git = "https://github.com/rakaly/ck3save.git" }
 hoi4save = { git = "https://github.com/rakaly/hoi4save.git" }
 vic3save = { git = "https://github.com/pdx-tools/pdx-tools" }
+eu5save = { git = "https://github.com/pdx-tools/pdx-tools" }
 thiserror = "2.0"
 
 [build-dependencies]

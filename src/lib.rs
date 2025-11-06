@@ -514,3 +514,31 @@ pub unsafe extern "C" fn rakaly_vic3_file(
         Err(_) => Box::into_raw(Box::new(PdsFileResult::Err(LibError::Panic))),
     }
 }
+
+/// Initializes an EU5 save from a pointer the save data bytes and a number of
+/// those bytes.
+///
+/// # Safety
+///
+/// The data is assumed to exist for the duration while the result of this
+/// function lives.
+#[no_mangle]
+pub unsafe extern "C" fn rakaly_eu5_file(
+    data_ptr: *const c_char,
+    data_len: size_t,
+) -> *mut PdsFileResult<'static> {
+    let res = std::panic::catch_unwind(|| {
+        let dp = data_ptr as *const c_uchar;
+        let data = unsafe { std::slice::from_raw_parts(dp, data_len) };
+        let result = match eu5save::Eu5File::from_slice(data) {
+            Ok(x) => PdsFileResult::Ok(PdsFile::Eu5(x)),
+            Err(err) => PdsFileResult::Err(err.into()),
+        };
+        Box::into_raw(Box::new(result))
+    });
+
+    match res {
+        Ok(x) => x,
+        Err(_) => Box::into_raw(Box::new(PdsFileResult::Err(LibError::Panic))),
+    }
+}

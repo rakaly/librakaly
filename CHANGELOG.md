@@ -1,3 +1,7 @@
+## v0.12.2 - 2025-11-14
+
+- Fix bug melting CK3 metadata
+
 ## v0.12.1 - 2025-11-07
 
 - Strip ironman flag on melted eu5 saves to avoid reverting to ironman 

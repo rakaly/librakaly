@@ -9,12 +9,9 @@ use crate::{
     },
     MeltedBuffer,
 };
-use ck3save::file::Ck3SliceFile;
 use eu4save::file::{Eu4SliceFile, Eu4Zip};
-use eu5save::Eu5File;
+use eu5save::{JominiFileKind, SaveDataKind};
 use hoi4save::file::Hoi4SliceFile;
-use imperator_save::file::{ImperatorSliceFile, ImperatorSliceFileKind};
-use vic3save::file::{Vic3SliceFile, Vic3SliceFileKind};
 
 pub enum PdsFileResult<'a> {
     Ok(PdsFile<'a>),
@@ -23,11 +20,11 @@ pub enum PdsFileResult<'a> {
 
 pub enum PdsFile<'a> {
     Eu4(Eu4SliceFile<'a>),
-    Ck3(Ck3SliceFile<'a>),
-    Imperator(ImperatorSliceFile<'a>),
+    Ck3(jomini::envelope::JominiFile<&'a [u8]>),
+    Imperator(jomini::envelope::JominiFile<&'a [u8]>),
     Hoi4(Hoi4SliceFile<'a>),
-    Vic3(Vic3SliceFile<'a>),
-    Eu5(Eu5File<&'a [u8]>),
+    Vic3(jomini::envelope::JominiFile<&'a [u8]>),
+    Eu5(jomini::envelope::JominiFile<&'a [u8]>),
 }
 
 impl PdsFile<'_> {
@@ -51,41 +48,191 @@ impl PdsFile<'_> {
     pub(crate) fn melt_file(&self) -> Result<MeltedBuffer, LibError> {
         match self {
             PdsFile::Eu4(file) => Melter::melt(file),
-            PdsFile::Ck3(file) => Melter::melt(file),
-            PdsFile::Imperator(file) => Melter::melt(file),
             PdsFile::Hoi4(file) => Melter::melt(file),
-            PdsFile::Vic3(file) => Melter::melt(file),
-            PdsFile::Eu5(file) => Melter::melt(file),
+
+            PdsFile::Ck3(file) => match file.kind() {
+                JominiFileKind::Uncompressed(SaveDataKind::Text(_)) => Ok(MeltedBuffer::Verbatim),
+                JominiFileKind::Uncompressed(SaveDataKind::Binary(binary)) => {
+                    let options = ck3save::MeltOptions::new()
+                        .verbatim(true)
+                        .on_failed_resolve(ck3save::FailedResolveStrategy::Stringify);
+                    let mut output = Cursor::new(Vec::new());
+                    let doc = ck3save::Ck3Melt::melt(
+                        &mut &*binary,
+                        options,
+                        ck3_tokens_resolver(),
+                        &mut output,
+                    )?;
+                    Ok(MeltedBuffer::Binary {
+                        body: output.into_inner(),
+                        unknown_tokens: !doc.unknown_tokens().is_empty(),
+                    })
+                }
+                JominiFileKind::Zip(zip) => {
+                    let options = ck3save::MeltOptions::new()
+                        .verbatim(true)
+                        .on_failed_resolve(ck3save::FailedResolveStrategy::Stringify);
+                    let mut output = Cursor::new(Vec::new());
+                    let doc =
+                        ck3save::Ck3Melt::melt(&mut &*zip, options, ck3_tokens_resolver(), &mut output)?;
+                    if file.header().kind().is_text() {
+                        Ok(MeltedBuffer::Text {
+                            header: Vec::new(),
+                            body: output.into_inner(),
+                        })
+                    } else {
+                        Ok(MeltedBuffer::Binary {
+                            body: output.into_inner(),
+                            unknown_tokens: !doc.unknown_tokens().is_empty(),
+                        })
+                    }
+                }
+            },
+            PdsFile::Imperator(file) => match file.kind() {
+                JominiFileKind::Uncompressed(SaveDataKind::Text(_)) => Ok(MeltedBuffer::Verbatim),
+                JominiFileKind::Uncompressed(SaveDataKind::Binary(binary)) => {
+                    let options = imperator_save::MeltOptions::new()
+                        .verbatim(true)
+                        .on_failed_resolve(imperator_save::FailedResolveStrategy::Stringify);
+                    let mut output = Cursor::new(Vec::new());
+                    let doc = imperator_save::ImperatorMelt::melt(
+                        &mut &*binary,
+                        options,
+                        imperator_tokens_resolver(),
+                        &mut output,
+                    )?;
+                    Ok(MeltedBuffer::Binary {
+                        body: output.into_inner(),
+                        unknown_tokens: !doc.unknown_tokens().is_empty(),
+                    })
+                }
+                JominiFileKind::Zip(zip) => {
+                    let options = imperator_save::MeltOptions::new()
+                        .verbatim(true)
+                        .on_failed_resolve(imperator_save::FailedResolveStrategy::Stringify);
+                    let mut output = Cursor::new(Vec::new());
+                    let doc = imperator_save::ImperatorMelt::melt(
+                        &mut &*zip,
+                        options,
+                        imperator_tokens_resolver(),
+                        &mut output,
+                    )?;
+                    if file.header().kind().is_text() {
+                        Ok(MeltedBuffer::Text {
+                            header: Vec::new(),
+                            body: output.into_inner(),
+                        })
+                    } else {
+                        Ok(MeltedBuffer::Binary {
+                            body: output.into_inner(),
+                            unknown_tokens: !doc.unknown_tokens().is_empty(),
+                        })
+                    }
+                }
+            },
+
+            PdsFile::Vic3(file) => match file.kind() {
+                JominiFileKind::Uncompressed(SaveDataKind::Text(_)) => Ok(MeltedBuffer::Verbatim),
+                JominiFileKind::Uncompressed(SaveDataKind::Binary(binary)) => {
+                    let options = vic3save::MeltOptions::new()
+                        .verbatim(true)
+                        .on_failed_resolve(vic3save::FailedResolveStrategy::Stringify);
+                    let mut output = Cursor::new(Vec::new());
+                    let doc = vic3save::Vic3Melt::melt(
+                        &mut &*binary,
+                        options,
+                        vic3_tokens_resolver(),
+                        &mut output,
+                    )?;
+                    Ok(MeltedBuffer::Binary {
+                        body: output.into_inner(),
+                        unknown_tokens: !doc.unknown_tokens().is_empty(),
+                    })
+                }
+                JominiFileKind::Zip(zip) => {
+                    let options = vic3save::MeltOptions::new()
+                        .verbatim(true)
+                        .on_failed_resolve(vic3save::FailedResolveStrategy::Stringify);
+                    let mut output = Cursor::new(Vec::new());
+                    let doc = vic3save::Vic3Melt::melt(
+                        &mut &*zip,
+                        options,
+                        vic3_tokens_resolver(),
+                        &mut output,
+                    )?;
+                    if file.header().kind().is_text() {
+                        Ok(MeltedBuffer::Text {
+                            header: Vec::new(),
+                            body: output.into_inner(),
+                        })
+                    } else {
+                        Ok(MeltedBuffer::Binary {
+                            body: output.into_inner(),
+                            unknown_tokens: !doc.unknown_tokens().is_empty(),
+                        })
+                    }
+                }
+            },
+
+            PdsFile::Eu5(file) => match file.kind() {
+                JominiFileKind::Uncompressed(SaveDataKind::Text(_)) => Ok(MeltedBuffer::Verbatim),
+                JominiFileKind::Uncompressed(SaveDataKind::Binary(binary)) => {
+                    let options = eu5save::MeltOptions::new()
+                        .verbatim(true)
+                        .on_failed_resolve(eu5save::FailedResolveStrategy::Stringify);
+                    let mut output = Cursor::new(Vec::new());
+                    let doc = eu5save::Eu5Melt::melt(
+                        &mut &*binary,
+                        options,
+                        eu5_tokens_resolver(),
+                        &mut output,
+                    )?;
+                    Ok(MeltedBuffer::Binary {
+                        body: output.into_inner(),
+                        unknown_tokens: !doc.unknown_tokens().is_empty(),
+                    })
+                }
+                JominiFileKind::Zip(zip) => {
+                    let options = eu5save::MeltOptions::new()
+                        .verbatim(true)
+                        .on_failed_resolve(eu5save::FailedResolveStrategy::Stringify);
+                    let mut output = Cursor::new(Vec::new());
+                    let doc =
+                        eu5save::Eu5Melt::melt(&mut &*zip, options, eu5_tokens_resolver(), &mut output)?;
+                    if file.header().kind().is_text() {
+                        Ok(MeltedBuffer::Text {
+                            header: Vec::new(),
+                            body: output.into_inner(),
+                        })
+                    } else {
+                        Ok(MeltedBuffer::Binary {
+                            body: output.into_inner(),
+                            unknown_tokens: !doc.unknown_tokens().is_empty(),
+                        })
+                    }
+                }
+            },
         }
     }
 
     pub(crate) fn is_binary(&self) -> bool {
         match self {
             PdsFile::Eu4(file) => file.encoding().is_binary(),
-            PdsFile::Ck3(file) => matches!(
-                file.encoding(),
-                ck3save::Encoding::Binary | ck3save::Encoding::BinaryZip
-            ),
-            PdsFile::Imperator(file) => matches!(
-                file.encoding(),
-                imperator_save::Encoding::Binary | imperator_save::Encoding::BinaryZip
-            ),
+            PdsFile::Ck3(file)
+            | PdsFile::Imperator(file)
+            | PdsFile::Eu5(file)
+            | PdsFile::Vic3(file) => file.header().kind().is_binary(),
             PdsFile::Hoi4(file) => matches!(file.encoding(), hoi4save::Encoding::Binary),
-            PdsFile::Vic3(file) => matches!(
-                file.encoding(),
-                vic3save::Encoding::Binary | vic3save::Encoding::BinaryZip
-            ),
-            PdsFile::Eu5(file) => file.header().kind().is_binary(),
         }
     }
 }
 
 pub enum PdsMeta<'data> {
     Eu4(Box<Eu4Zip<&'data [u8]>>),
-    Ck3(Ck3SliceFile<'data>),
-    Imperator(ImperatorSliceFile<'data>),
-    Vic3(Vic3SliceFile<'data>),
-    Eu5(Eu5File<&'data [u8]>),
+    Ck3(jomini::envelope::JominiFile<&'data [u8]>),
+    Imperator(jomini::envelope::JominiFile<&'data [u8]>),
+    Vic3(jomini::envelope::JominiFile<&'data [u8]>),
+    Eu5(jomini::envelope::JominiFile<&'data [u8]>),
 }
 
 impl PdsMeta<'_> {
@@ -111,25 +258,36 @@ impl PdsMeta<'_> {
                 }
             }
             PdsMeta::Ck3(file) => match file.kind() {
-                ck3save::file::Ck3SliceFileKind::Text(_) => Ok(MeltedBuffer::Verbatim),
-                ck3save::file::Ck3SliceFileKind::Binary(binary) => {
-                    let options = ck3save::MeltOptions::new().verbatim(true);
+                JominiFileKind::Uncompressed(SaveDataKind::Text(_)) => Ok(MeltedBuffer::Verbatim),
+                JominiFileKind::Uncompressed(SaveDataKind::Binary(binary)) => {
+                    let options = ck3save::MeltOptions::new()
+                        .verbatim(true)
+                        .on_failed_resolve(ck3save::FailedResolveStrategy::Stringify);
                     let mut output = Cursor::new(Vec::new());
-                    let doc = binary
-                        .clone()
-                        .melt(options, ck3_tokens_resolver(), &mut output)?;
+                    let doc = ck3save::Ck3Melt::melt(
+                        &mut &*binary,
+                        options,
+                        ck3_tokens_resolver(),
+                        &mut output,
+                    )?;
                     Ok(MeltedBuffer::Binary {
                         body: output.into_inner(),
                         unknown_tokens: !doc.unknown_tokens().is_empty(),
                     })
                 }
-                ck3save::file::Ck3SliceFileKind::Zip(zip) => {
-                    let options = ck3save::MeltOptions::new().verbatim(true);
+                JominiFileKind::Zip(zip) => {
+                    let options = ck3save::MeltOptions::new()
+                        .verbatim(true)
+                        .on_failed_resolve(ck3save::FailedResolveStrategy::Stringify);
                     let mut output = Cursor::new(Vec::new());
-                    let doc = zip
-                        .meta()?
-                        .melt(options, ck3_tokens_resolver(), &mut output)?;
-                    if matches!(file.encoding(), ck3save::Encoding::TextZip) {
+                    let mut meta = zip.meta()?;
+                    let doc = ck3save::Ck3Melt::melt(
+                        &mut meta,
+                        options,
+                        ck3_tokens_resolver(),
+                        &mut output,
+                    )?;
+                    if file.header().kind().is_text() {
                         Ok(MeltedBuffer::Text {
                             header: Vec::new(),
                             body: output.into_inner(),
@@ -143,26 +301,36 @@ impl PdsMeta<'_> {
                 }
             },
             PdsMeta::Imperator(file) => match file.kind() {
-                ImperatorSliceFileKind::Text(_) => Ok(MeltedBuffer::Verbatim),
-                ImperatorSliceFileKind::Binary(binary) => {
-                    let options = imperator_save::MeltOptions::new().verbatim(true);
+                JominiFileKind::Uncompressed(SaveDataKind::Text(_)) => Ok(MeltedBuffer::Verbatim),
+                JominiFileKind::Uncompressed(SaveDataKind::Binary(binary)) => {
+                    let options = imperator_save::MeltOptions::new()
+                        .verbatim(true)
+                        .on_failed_resolve(imperator_save::FailedResolveStrategy::Stringify);
                     let mut output = Cursor::new(Vec::new());
-                    let doc =
-                        binary
-                            .clone()
-                            .melt(options, imperator_tokens_resolver(), &mut output)?;
+                    let doc = imperator_save::ImperatorMelt::melt(
+                        &mut &*binary,
+                        options,
+                        imperator_tokens_resolver(),
+                        &mut output,
+                    )?;
                     Ok(MeltedBuffer::Binary {
                         body: output.into_inner(),
                         unknown_tokens: !doc.unknown_tokens().is_empty(),
                     })
                 }
-                ImperatorSliceFileKind::Zip(zip) => {
-                    let options = imperator_save::MeltOptions::new().verbatim(true);
+                JominiFileKind::Zip(zip) => {
+                    let options = imperator_save::MeltOptions::new()
+                        .verbatim(true)
+                        .on_failed_resolve(imperator_save::FailedResolveStrategy::Stringify);
                     let mut output = Cursor::new(Vec::new());
-                    let doc =
-                        zip.meta()?
-                            .melt(options, imperator_tokens_resolver(), &mut output)?;
-                    if matches!(file.encoding(), imperator_save::Encoding::TextZip) {
+                    let mut meta = zip.meta()?;
+                    let doc = imperator_save::ImperatorMelt::melt(
+                        &mut meta,
+                        options,
+                        imperator_tokens_resolver(),
+                        &mut output,
+                    )?;
+                    if file.header().kind().is_text() {
                         Ok(MeltedBuffer::Text {
                             header: Vec::new(),
                             body: output.into_inner(),
@@ -175,53 +343,93 @@ impl PdsMeta<'_> {
                     }
                 }
             },
-            PdsMeta::Vic3(file) => match file.kind() {
-                Vic3SliceFileKind::Text(_) => Ok(MeltedBuffer::Verbatim),
-                Vic3SliceFileKind::Binary(binary) => {
-                    let options = vic3save::MeltOptions::new().verbatim(true);
-                    let mut output = Cursor::new(Vec::new());
-                    let doc = binary
-                        .clone()
-                        .melt(options, vic3_tokens_resolver(), &mut output)?;
-                    Ok(MeltedBuffer::Binary {
-                        body: output.into_inner(),
-                        unknown_tokens: !doc.unknown_tokens().is_empty(),
-                    })
-                }
-                Vic3SliceFileKind::Zip(zip) => {
-                    let options = vic3save::MeltOptions::new().verbatim(true);
-                    let mut output = Cursor::new(Vec::new());
-                    let doc = zip
-                        .meta()?
-                        .melt(options, vic3_tokens_resolver(), &mut output)?;
-                    if matches!(file.encoding(), vic3save::Encoding::TextZip) {
-                        Ok(MeltedBuffer::Text {
-                            header: Vec::new(),
-                            body: output.into_inner(),
-                        })
-                    } else {
-                        Ok(MeltedBuffer::Binary {
-                            body: output.into_inner(),
-                            unknown_tokens: !doc.unknown_tokens().is_empty(),
-                        })
-                    }
-                }
-            },
-            PdsMeta::Eu5(file) => {
-                let options = eu5save::MeltOptions::new().verbatim(true);
-                let mut output = Cursor::new(Vec::new());
 
-                match file.meta() {
-                    eu5save::Eu5MetaKind::Text(_) => Ok(MeltedBuffer::Verbatim),
-                    eu5save::Eu5MetaKind::Binary(mut bin) => {
-                        bin.melt(options, eu5_tokens_resolver(), &mut output)?;
+            PdsMeta::Vic3(file) => match file.kind() {
+                JominiFileKind::Uncompressed(SaveDataKind::Text(_)) => Ok(MeltedBuffer::Verbatim),
+                JominiFileKind::Uncompressed(SaveDataKind::Binary(binary)) => {
+                    let options = vic3save::MeltOptions::new()
+                        .verbatim(true)
+                        .on_failed_resolve(vic3save::FailedResolveStrategy::Stringify);
+                    let mut output = Cursor::new(Vec::new());
+                    let doc = vic3save::Vic3Melt::melt(
+                        &mut &*binary,
+                        options,
+                        vic3_tokens_resolver(),
+                        &mut output,
+                    )?;
+                    Ok(MeltedBuffer::Binary {
+                        body: output.into_inner(),
+                        unknown_tokens: !doc.unknown_tokens().is_empty(),
+                    })
+                }
+                JominiFileKind::Zip(zip) => {
+                    let options = vic3save::MeltOptions::new()
+                        .verbatim(true)
+                        .on_failed_resolve(vic3save::FailedResolveStrategy::Stringify);
+                    let mut output = Cursor::new(Vec::new());
+                    let mut meta = zip.meta()?;
+                    let doc = vic3save::Vic3Melt::melt(
+                        &mut meta,
+                        options,
+                        vic3_tokens_resolver(),
+                        &mut output,
+                    )?;
+                    if file.header().kind().is_text() {
+                        Ok(MeltedBuffer::Text {
+                            header: Vec::new(),
+                            body: output.into_inner(),
+                        })
+                    } else {
                         Ok(MeltedBuffer::Binary {
                             body: output.into_inner(),
-                            unknown_tokens: false,
+                            unknown_tokens: !doc.unknown_tokens().is_empty(),
                         })
                     }
                 }
-            }
+            },
+            PdsMeta::Eu5(file) => match file.kind() {
+                JominiFileKind::Uncompressed(SaveDataKind::Text(_)) => Ok(MeltedBuffer::Verbatim),
+                JominiFileKind::Uncompressed(SaveDataKind::Binary(binary)) => {
+                    let options = eu5save::MeltOptions::new()
+                        .verbatim(true)
+                        .on_failed_resolve(eu5save::FailedResolveStrategy::Stringify);
+                    let mut output = Cursor::new(Vec::new());
+                    let doc = eu5save::Eu5Melt::melt(
+                        &mut &*binary,
+                        options,
+                        eu5_tokens_resolver(),
+                        &mut output,
+                    )?;
+                    Ok(MeltedBuffer::Binary {
+                        body: output.into_inner(),
+                        unknown_tokens: !doc.unknown_tokens().is_empty(),
+                    })
+                }
+                JominiFileKind::Zip(zip) => {
+                    let options = eu5save::MeltOptions::new()
+                        .verbatim(true)
+                        .on_failed_resolve(eu5save::FailedResolveStrategy::Stringify);
+                    let mut output = Cursor::new(Vec::new());
+                    let mut meta = zip.meta()?;
+                    let doc = eu5save::Eu5Melt::melt(
+                        &mut meta,
+                        options,
+                        eu5_tokens_resolver(),
+                        &mut output,
+                    )?;
+                    if file.header().kind().is_text() {
+                        Ok(MeltedBuffer::Text {
+                            header: Vec::new(),
+                            body: output.into_inner(),
+                        })
+                    } else {
+                        Ok(MeltedBuffer::Binary {
+                            body: output.into_inner(),
+                            unknown_tokens: !doc.unknown_tokens().is_empty(),
+                        })
+                    }
+                }
+            },
         }
     }
 }

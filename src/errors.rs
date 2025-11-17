@@ -20,6 +20,9 @@ pub enum LibError {
     #[error("eu5 error: {0}")]
     Eu5(#[from] eu5save::Eu5Error),
 
+    #[error("file envelope error: {0}")]
+    Envelope(#[from] jomini::envelope::EnvelopeError),
+
     #[error("panic! Error message may be on stdout/stderr")]
     Panic,
 }

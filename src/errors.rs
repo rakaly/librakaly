@@ -23,6 +23,9 @@ pub enum LibError {
     #[error("file envelope error: {0}")]
     Envelope(#[from] jomini::envelope::EnvelopeError),
 
+    #[error("Unsupported operation: {0}")]
+    UnsupportedOperation(String),
+
     #[error("panic! Error message may be on stdout/stderr")]
     Panic,
 }

@@ -1,8 +1,6 @@
 use crate::{
     errors::LibError,
-    tokens::{
-        eu4_tokens_resolver, hoi4_tokens_resolver,
-    },
+    tokens::{eu4_tokens_resolver, hoi4_tokens_resolver},
 };
 use eu4save::file::Eu4SliceFile;
 use hoi4save::file::Hoi4SliceFile;

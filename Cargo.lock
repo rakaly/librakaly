@@ -79,7 +79,7 @@ checksum = "46c5e41b57b8bba42a04676d81cb89e9ee8e859a1a66f80a5a72e1cb76b34d43"
 [[package]]
 name = "bumpalo-serde"
 version = "0.1.0"
-source = "git+https://github.com/pdx-tools/pdx-tools#d150c442345efac3454e5b8484958739a23f451b"
+source = "git+https://github.com/pdx-tools/pdx-tools#67529c613227ef70c4b9a22fb0af626ef0ce2140"
 dependencies = [
  "bumpalo",
  "bumpalo-serde-derive",
@@ -89,7 +89,7 @@ dependencies = [
 [[package]]
 name = "bumpalo-serde-derive"
 version = "0.1.0"
-source = "git+https://github.com/pdx-tools/pdx-tools#d150c442345efac3454e5b8484958739a23f451b"
+source = "git+https://github.com/pdx-tools/pdx-tools#67529c613227ef70c4b9a22fb0af626ef0ce2140"
 dependencies = [
  "bumpalo",
  "quote",
@@ -125,7 +125,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 [[package]]
 name = "ck3save"
 version = "0.4.3"
-source = "git+https://github.com/rakaly/ck3save.git#2af3e2e85e2f1d1a57ef4ec90471c09e173b5895"
+source = "git+https://github.com/rakaly/ck3save.git#1772f9ce84e7997500d48b62ba40fc0ba515b927"
 dependencies = [
  "jomini",
  "serde",
@@ -208,7 +208,7 @@ dependencies = [
 [[package]]
 name = "eu4save"
 version = "0.8.2"
-source = "git+https://github.com/rakaly/eu4save.git#cb763062ee709dbbe40e26a606b721401cb2f311"
+source = "git+https://github.com/rakaly/eu4save.git#1add4bef703e6443e656333928b714f4a34feac3"
 dependencies = [
  "flate2",
  "jomini",
@@ -220,7 +220,7 @@ dependencies = [
 [[package]]
 name = "eu5save"
 version = "0.1.0"
-source = "git+https://github.com/pdx-tools/pdx-tools#d150c442345efac3454e5b8484958739a23f451b"
+source = "git+https://github.com/pdx-tools/pdx-tools#67529c613227ef70c4b9a22fb0af626ef0ce2140"
 dependencies = [
  "bumpalo",
  "bumpalo-serde",
@@ -292,7 +292,7 @@ checksum = "d231dfb89cfffdbc30e7fc41579ed6066ad03abda9e567ccafae602b97ec5024"
 [[package]]
 name = "hoi4save"
 version = "0.4.0"
-source = "git+https://github.com/rakaly/hoi4save.git#ae0334d9b8cd5969e17016648e5e7a25be3a1c33"
+source = "git+https://github.com/rakaly/hoi4save.git#da1b961338802396bef3de357aa4df06a6778917"
 dependencies = [
  "jomini",
  "serde",
@@ -302,7 +302,7 @@ dependencies = [
 [[package]]
 name = "imperator-save"
 version = "0.4.2"
-source = "git+https://github.com/rakaly/imperator-save.git#73ab8500ab236da1bf869a4fdc2dc52b0ba4ace9"
+source = "git+https://github.com/rakaly/imperator-save.git#d23b2ef23aa2afcd46765039cc704620aa128ae1"
 dependencies = [
  "jomini",
  "serde",
@@ -333,9 +333,9 @@ checksum = "4a5f13b858c8d314ee3e8f639011f7ccefe71f97f96e50151fb991f267928e2c"
 
 [[package]]
 name = "jomini"
-version = "0.30.1"
+version = "0.32.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "debb135aec9b2908825711276118e0376f4dcbe764f956ee3ec66da7df66bfbd"
+checksum = "a64a65bdea700e849e07cc1d2ba3001ebb25ae29d1205e2893ae48f0a15ccb67"
 dependencies = [
  "flate2",
  "itoa",
@@ -535,9 +535,9 @@ checksum = "60a357793950651c4ed0f3f52338f53b2f809f32d83a07f72909fa13e4c6c1e3"
 
 [[package]]
 name = "rawzip"
-version = "0.4.1"
+version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "70171b805bd97a69690df1b634104649ad193430aa60d8305dfb9b470fe690a8"
+checksum = "27cc19f82b641448e861623f52a6a6413bbc0595b62a9d45bf31ccdf18aab72c"
 
 [[package]]
 name = "rustix"
@@ -724,7 +724,7 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 [[package]]
 name = "vic3save"
 version = "0.1.0"
-source = "git+https://github.com/pdx-tools/pdx-tools#d150c442345efac3454e5b8484958739a23f451b"
+source = "git+https://github.com/pdx-tools/pdx-tools#67529c613227ef70c4b9a22fb0af626ef0ce2140"
 dependencies = [
  "getrandom 0.2.15",
  "jomini",

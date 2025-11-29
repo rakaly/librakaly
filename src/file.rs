@@ -20,11 +20,11 @@ pub enum PdsFileResult<'a> {
 
 pub enum PdsFile<'a> {
     Eu4(Eu4SliceFile<'a>),
-    Ck3(jomini::envelope::JominiFile<&'a [u8]>),
-    Imperator(jomini::envelope::JominiFile<&'a [u8]>),
+    Ck3(jomini::envelope::JominiFile<Cursor<&'a [u8]>>),
+    Imperator(jomini::envelope::JominiFile<Cursor<&'a [u8]>>),
     Hoi4(Hoi4SliceFile<'a>),
-    Vic3(jomini::envelope::JominiFile<&'a [u8]>),
-    Eu5(jomini::envelope::JominiFile<&'a [u8]>),
+    Vic3(jomini::envelope::JominiFile<Cursor<&'a [u8]>>),
+    Eu5(jomini::envelope::JominiFile<Cursor<&'a [u8]>>),
 }
 
 impl PdsFile<'_> {
@@ -73,8 +73,12 @@ impl PdsFile<'_> {
                         .verbatim(true)
                         .on_failed_resolve(ck3save::FailedResolveStrategy::Stringify);
                     let mut output = Cursor::new(Vec::new());
-                    let doc =
-                        ck3save::Ck3Melt::melt(&mut &*zip, options, ck3_tokens_resolver(), &mut output)?;
+                    let doc = ck3save::Ck3Melt::melt(
+                        &mut &*zip,
+                        options,
+                        ck3_tokens_resolver(),
+                        &mut output,
+                    )?;
                     if file.header().kind().is_text() {
                         Ok(MeltedBuffer::Text {
                             header: Vec::new(),
@@ -176,29 +180,16 @@ impl PdsFile<'_> {
 
             PdsFile::Eu5(file) => match file.kind() {
                 JominiFileKind::Uncompressed(SaveDataKind::Text(_)) => Ok(MeltedBuffer::Verbatim),
-                JominiFileKind::Uncompressed(SaveDataKind::Binary(binary)) => {
-                    let options = eu5save::MeltOptions::new()
-                        .verbatim(true)
-                        .on_failed_resolve(eu5save::FailedResolveStrategy::Stringify);
-                    let mut output = Cursor::new(Vec::new());
-                    let doc = eu5save::Eu5Melt::melt(
-                        &mut &*binary,
-                        options,
-                        eu5_tokens_resolver(),
-                        &mut output,
-                    )?;
-                    Ok(MeltedBuffer::Binary {
-                        body: output.into_inner(),
-                        unknown_tokens: !doc.unknown_tokens().is_empty(),
-                    })
-                }
+                JominiFileKind::Uncompressed(SaveDataKind::Binary(_)) => Err(
+                    LibError::UnsupportedOperation(String::from("melting uncompressed eu5 binary")),
+                ),
                 JominiFileKind::Zip(zip) => {
                     let options = eu5save::MeltOptions::new()
                         .verbatim(true)
                         .on_failed_resolve(eu5save::FailedResolveStrategy::Stringify);
                     let mut output = Cursor::new(Vec::new());
-                    let doc =
-                        eu5save::Eu5Melt::melt(&mut &*zip, options, eu5_tokens_resolver(), &mut output)?;
+                    let resolver = eu5save::SaveResolver::create(zip, eu5_tokens_resolver())?;
+                    let doc = eu5save::Eu5Melt::melt(&mut &*zip, options, resolver, &mut output)?;
                     if file.header().kind().is_text() {
                         Ok(MeltedBuffer::Text {
                             header: Vec::new(),
@@ -229,10 +220,10 @@ impl PdsFile<'_> {
 
 pub enum PdsMeta<'data> {
     Eu4(Box<Eu4Zip<&'data [u8]>>),
-    Ck3(jomini::envelope::JominiFile<&'data [u8]>),
-    Imperator(jomini::envelope::JominiFile<&'data [u8]>),
-    Vic3(jomini::envelope::JominiFile<&'data [u8]>),
-    Eu5(jomini::envelope::JominiFile<&'data [u8]>),
+    Ck3(jomini::envelope::JominiFile<Cursor<&'data [u8]>>),
+    Imperator(jomini::envelope::JominiFile<Cursor<&'data [u8]>>),
+    Vic3(jomini::envelope::JominiFile<Cursor<&'data [u8]>>),
+    Eu5(jomini::envelope::JominiFile<Cursor<&'data [u8]>>),
 }
 
 impl PdsMeta<'_> {
@@ -389,34 +380,17 @@ impl PdsMeta<'_> {
             },
             PdsMeta::Eu5(file) => match file.kind() {
                 JominiFileKind::Uncompressed(SaveDataKind::Text(_)) => Ok(MeltedBuffer::Verbatim),
-                JominiFileKind::Uncompressed(SaveDataKind::Binary(binary)) => {
-                    let options = eu5save::MeltOptions::new()
-                        .verbatim(true)
-                        .on_failed_resolve(eu5save::FailedResolveStrategy::Stringify);
-                    let mut output = Cursor::new(Vec::new());
-                    let doc = eu5save::Eu5Melt::melt(
-                        &mut &*binary,
-                        options,
-                        eu5_tokens_resolver(),
-                        &mut output,
-                    )?;
-                    Ok(MeltedBuffer::Binary {
-                        body: output.into_inner(),
-                        unknown_tokens: !doc.unknown_tokens().is_empty(),
-                    })
-                }
+                JominiFileKind::Uncompressed(SaveDataKind::Binary(_)) => Err(
+                    LibError::UnsupportedOperation(String::from("melting uncompressed eu5 binary")),
+                ),
                 JominiFileKind::Zip(zip) => {
                     let options = eu5save::MeltOptions::new()
                         .verbatim(true)
                         .on_failed_resolve(eu5save::FailedResolveStrategy::Stringify);
                     let mut output = Cursor::new(Vec::new());
                     let mut meta = zip.meta()?;
-                    let doc = eu5save::Eu5Melt::melt(
-                        &mut meta,
-                        options,
-                        eu5_tokens_resolver(),
-                        &mut output,
-                    )?;
+                    let resolver = eu5save::SaveResolver::create(zip, eu5_tokens_resolver())?;
+                    let doc = eu5save::Eu5Melt::melt(&mut meta, options, resolver, &mut output)?;
                     if file.header().kind().is_text() {
                         Ok(MeltedBuffer::Text {
                             header: Vec::new(),

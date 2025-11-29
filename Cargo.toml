@@ -20,7 +20,7 @@ eu5save = { git = "https://github.com/pdx-tools/pdx-tools" }
 hoi4save = { git = "https://github.com/rakaly/hoi4save.git" }
 imperator-save = { git = "https://github.com/rakaly/imperator-save.git" }
 vic3save = { git = "https://github.com/pdx-tools/pdx-tools" }
-jomini = { version = "0.30", features = ["envelope", "json"] }
+jomini = { version = "0.32", features = ["envelope", "json"] }
 libc = "0.2"
 thiserror = "2.0"
 

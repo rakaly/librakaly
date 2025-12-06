@@ -1,3 +1,9 @@
+## v0.12.3 - 2025-11-14
+
+- Support for EU5 1.0.8 saves
+- Support for EU5 1.0.10 saves
+- Support for HOI4 1.17 saves
+
 ## v0.12.2 - 2025-11-14
 
 - Fix bug melting CK3 metadata

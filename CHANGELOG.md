@@ -1,3 +1,7 @@
+## v0.12.5 - 2025-12-15
+
+- Improve EU5 melter accuracy, fixing blank map for melted saves with custom names.
+
 ## v0.12.4 - 2025-12-12
 
 - Update to support Vic3 1.12 saves

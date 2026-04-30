@@ -1,3 +1,10 @@
+## v0.12.6 - 2026-04-30
+
+- Update to support EU5 1.2 saves
+- Update to support CK3 1.19 saves
+- Update to support HOI4 1.18 saves
+- Update to support Vic3 1.13 saves
+
 ## v0.12.5 - 2025-12-15
 
 - Improve EU5 melter accuracy, fixing blank map for melted saves with custom names.

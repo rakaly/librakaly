@@ -219,7 +219,7 @@ impl PdsFile<'_> {
 }
 
 pub enum PdsMeta<'data> {
-    Eu4(Box<Eu4Zip<&'data [u8]>>),
+    Eu4(Box<Eu4Zip<Cursor<&'data [u8]>>>),
     Ck3(jomini::envelope::JominiFile<Cursor<&'data [u8]>>),
     Imperator(jomini::envelope::JominiFile<Cursor<&'data [u8]>>),
     Vic3(jomini::envelope::JominiFile<Cursor<&'data [u8]>>),

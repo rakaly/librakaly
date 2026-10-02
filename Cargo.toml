@@ -14,13 +14,13 @@ crate-type = ["cdylib"]
 name = "rakaly"
 
 [dependencies]
-ck3save = { git = "https://github.com/rakaly/ck3save.git" }
-eu4save = { git = "https://github.com/rakaly/eu4save.git", default-features = false }
-eu5save = { git = "https://github.com/pdx-tools/pdx-tools" }
-hoi4save = { git = "https://github.com/rakaly/hoi4save.git" }
-imperator-save = { git = "https://github.com/rakaly/imperator-save.git" }
-vic3save = { git = "https://github.com/pdx-tools/pdx-tools" }
-jomini = { version = "0.35", features = ["envelope", "json"] }
+ck3save = { git = "https://github.com/rakaly/jomini" }
+eu4save = { git = "https://github.com/rakaly/jomini" }
+eu5save = { git = "https://github.com/rakaly/jomini" }
+hoi4save = { git = "https://github.com/rakaly/jomini" }
+imperator-save = { git = "https://github.com/rakaly/jomini" }
+vic3save = { git = "https://github.com/rakaly/jomini" }
+jomini = { version = "0.37", features = ["envelope", "json"] }
 libc = "0.2"
 thiserror = "2.0"
 

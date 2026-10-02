@@ -59,6 +59,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "arena-serde"
+version = "0.1.0"
+source = "git+https://github.com/rakaly/jomini#88fc49942c8b3e3b0debe60779ec8d8960dd184e"
+dependencies = [
+ "arena-serde-derive",
+ "bumpalo",
+ "serde",
+]
+
+[[package]]
+name = "arena-serde-derive"
+version = "0.1.0"
+source = "git+https://github.com/rakaly/jomini#88fc49942c8b3e3b0debe60779ec8d8960dd184e"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -75,27 +95,6 @@ name = "bumpalo"
 version = "3.20.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "72f5acc6cb2ba439de613abc23857ec3d78374d8ed5ac84e9d11336e87da8649"
-
-[[package]]
-name = "bumpalo-serde"
-version = "0.1.0"
-source = "git+https://github.com/pdx-tools/pdx-tools#1ef4f4add9a99ff53e4cb6e9ddf152fa203a23a1"
-dependencies = [
- "bumpalo",
- "bumpalo-serde-derive",
- "serde",
-]
-
-[[package]]
-name = "bumpalo-serde-derive"
-version = "0.1.0"
-source = "git+https://github.com/pdx-tools/pdx-tools#1ef4f4add9a99ff53e4cb6e9ddf152fa203a23a1"
-dependencies = [
- "bumpalo",
- "quote",
- "serde",
- "syn",
-]
 
 [[package]]
 name = "cbindgen"
@@ -125,7 +124,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 [[package]]
 name = "ck3save"
 version = "0.4.3"
-source = "git+https://github.com/rakaly/ck3save.git#02561a12c1cf510b31b1e1ad3c4cb00af9ac25e5"
+source = "git+https://github.com/rakaly/jomini#88fc49942c8b3e3b0debe60779ec8d8960dd184e"
 dependencies = [
  "jomini",
  "serde",
@@ -208,7 +207,7 @@ dependencies = [
 [[package]]
 name = "eu4save"
 version = "0.8.2"
-source = "git+https://github.com/rakaly/eu4save.git#60877eb4c28fd423e588013e34672cacf63e0b1e"
+source = "git+https://github.com/rakaly/jomini#88fc49942c8b3e3b0debe60779ec8d8960dd184e"
 dependencies = [
  "flate2",
  "jomini",
@@ -220,15 +219,13 @@ dependencies = [
 [[package]]
 name = "eu5save"
 version = "0.1.0"
-source = "git+https://github.com/pdx-tools/pdx-tools#1ef4f4add9a99ff53e4cb6e9ddf152fa203a23a1"
+source = "git+https://github.com/rakaly/jomini#88fc49942c8b3e3b0debe60779ec8d8960dd184e"
 dependencies = [
+ "arena-serde",
  "bumpalo",
- "bumpalo-serde",
  "jomini",
  "serde",
  "thiserror",
- "tsify",
- "wasm-bindgen",
 ]
 
 [[package]]
@@ -246,30 +243,6 @@ dependencies = [
  "crc32fast",
  "libz-rs-sys",
  "miniz_oxide",
-]
-
-[[package]]
-name = "futures-core"
-version = "0.3.32"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7e3450815272ef58cec6d564423f6e755e25379b217b0bc688e295ba24df6b1d"
-
-[[package]]
-name = "futures-task"
-version = "0.3.32"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "037711b3d59c33004d3856fbdc83b99d4ff37a24768fa1be9ce3538a1cde4393"
-
-[[package]]
-name = "futures-util"
-version = "0.3.32"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "389ca41296e6190b48053de0321d02a77f32f8a5d2461dd38762c0593805c6d6"
-dependencies = [
- "futures-core",
- "futures-task",
- "pin-project-lite",
- "slab",
 ]
 
 [[package]]
@@ -307,7 +280,7 @@ checksum = "d231dfb89cfffdbc30e7fc41579ed6066ad03abda9e567ccafae602b97ec5024"
 [[package]]
 name = "hoi4save"
 version = "0.4.0"
-source = "git+https://github.com/rakaly/hoi4save.git#dd4879835b45ea2197a6e89e73e794b4e4f930c1"
+source = "git+https://github.com/rakaly/jomini#88fc49942c8b3e3b0debe60779ec8d8960dd184e"
 dependencies = [
  "jomini",
  "serde",
@@ -317,7 +290,7 @@ dependencies = [
 [[package]]
 name = "imperator-save"
 version = "0.4.2"
-source = "git+https://github.com/rakaly/imperator-save.git#2df19e2580c37f75f352266cd38d4780fb4f53d5"
+source = "git+https://github.com/rakaly/jomini#88fc49942c8b3e3b0debe60779ec8d8960dd184e"
 dependencies = [
  "jomini",
  "serde",
@@ -348,9 +321,9 @@ checksum = "4a5f13b858c8d314ee3e8f639011f7ccefe71f97f96e50151fb991f267928e2c"
 
 [[package]]
 name = "jomini"
-version = "0.35.0"
+version = "0.37.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4f4c61579587088dfada0b4aab19b4117a916964998e2bbc1f84363976145433"
+checksum = "ab6b0735f2ab0de85c7927c1d579b1f9b904cdf0279f6280f4253a98527c3cd4"
 dependencies = [
  "flate2",
  "itoa",
@@ -377,7 +350,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "53b44bfcdb3f8d5837a46dae1ca9660a837176eee74a28b229bc626816589102"
 dependencies = [
  "cfg-if",
- "futures-util",
  "wasm-bindgen",
 ]
 
@@ -509,12 +481,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cde51589ab56b20a6f686b2c68f7a0bd6add753d697abf720d63f8db3ab7b1ad"
 
 [[package]]
-name = "pin-project-lite"
-version = "0.2.17"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a89322df9ebe1c1578d689c92318e070967d1042b512afbe49518723f4e6d5cd"
-
-[[package]]
 name = "ppv-lite86"
 version = "0.2.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -624,17 +590,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "serde-wasm-bindgen"
-version = "0.6.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8302e169f0eddcc139c70f139d19d6467353af16f9fce27e8c30158036a1e16b"
-dependencies = [
- "js-sys",
- "serde",
- "wasm-bindgen",
-]
-
-[[package]]
 name = "serde_core"
 version = "1.0.228"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -648,17 +603,6 @@ name = "serde_derive"
 version = "1.0.228"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d540f220d3187173da220f885ab66608367b6574e925011a9353e4badda91d79"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "serde_derive_internals"
-version = "0.29.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "18d26a20a969b9e3fdf2fc2d9f21eda6c40e2de84c9408bb5d3b05d499aae711"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -691,12 +635,6 @@ name = "simd-adler32"
 version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d66dc143e6b11c1eddc06d5c423cfc97062865baf299914ab64caa38182078fe"
-
-[[package]]
-name = "slab"
-version = "0.4.12"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0c790de23124f9ab44544d7ac05d60440adc586479ce501c1d6d7da3cd8c9cf5"
 
 [[package]]
 name = "strsim"
@@ -793,30 +731,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tsify"
-version = "0.5.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ec5505497c87f1c050b4392d3f11b49a04537fcb9dc0da57bc0af168a6331f2"
-dependencies = [
- "serde",
- "serde-wasm-bindgen",
- "tsify-macros",
- "wasm-bindgen",
-]
-
-[[package]]
-name = "tsify-macros"
-version = "0.5.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9fc2c44dc9fe4baf55b88e032621b7a11b215a1f0a7de8d0aa04367207d915bc"
-dependencies = [
- "proc-macro2",
- "quote",
- "serde_derive_internals",
- "syn",
-]
-
-[[package]]
 name = "unicode-ident"
 version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -831,7 +745,7 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 [[package]]
 name = "vic3save"
 version = "0.1.0"
-source = "git+https://github.com/pdx-tools/pdx-tools#1ef4f4add9a99ff53e4cb6e9ddf152fa203a23a1"
+source = "git+https://github.com/rakaly/jomini#88fc49942c8b3e3b0debe60779ec8d8960dd184e"
 dependencies = [
  "getrandom",
  "jomini",

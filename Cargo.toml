@@ -21,7 +21,6 @@ hoi4save = { git = "https://github.com/rakaly/jomini" }
 imperator-save = { git = "https://github.com/rakaly/jomini" }
 vic3save = { git = "https://github.com/rakaly/jomini" }
 jomini = { version = "0.37", features = ["envelope", "json"] }
-libc = "0.2"
 thiserror = "2.0"
 
 [build-dependencies]

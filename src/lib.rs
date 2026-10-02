@@ -6,7 +6,7 @@ mod tokens;
 use crate::errors::LibError;
 use errors::PdsError;
 use file::{PdsFile, PdsFileResult, PdsMeta};
-use libc::{c_char, c_int, c_uchar, size_t};
+use core::ffi::{c_char, c_int, c_uchar};
 use melter::{MeltedBuffer, MeltedBufferResult};
 use std::hint::unreachable_unchecked;
 
@@ -28,7 +28,7 @@ pub unsafe extern "C" fn rakaly_free_melt(res: *mut MeltedBuffer) {
 ///
 /// Must pass in a valid pointer to a `MeltedBuffer`
 #[no_mangle]
-pub unsafe extern "C" fn rakaly_melt_data_length(res: *const MeltedBuffer) -> size_t {
+pub unsafe extern "C" fn rakaly_melt_data_length(res: *const MeltedBuffer) -> usize {
     if res.is_null() {
         return 0;
     }
@@ -91,8 +91,8 @@ pub unsafe extern "C" fn rakaly_melt_binary_unknown_tokens(res: *const MeltedBuf
 pub unsafe extern "C" fn rakaly_melt_write_data(
     res: *const MeltedBuffer,
     buffer: *mut c_char,
-    length: size_t,
-) -> size_t {
+    length: usize,
+) -> usize {
     if res.is_null() || buffer.is_null() {
         return 0;
     }
@@ -385,7 +385,7 @@ pub unsafe extern "C" fn rakaly_melt_value(ptr: *mut MeltedBufferResult) -> *mut
 #[no_mangle]
 pub unsafe extern "C" fn rakaly_eu4_file(
     data_ptr: *const c_char,
-    data_len: size_t,
+    data_len: usize,
 ) -> *mut PdsFileResult<'static> {
     let res = std::panic::catch_unwind(|| {
         let dp = data_ptr as *const c_uchar;
@@ -413,7 +413,7 @@ pub unsafe extern "C" fn rakaly_eu4_file(
 #[no_mangle]
 pub unsafe extern "C" fn rakaly_ck3_file(
     data_ptr: *const c_char,
-    data_len: size_t,
+    data_len: usize,
 ) -> *mut PdsFileResult<'static> {
     let res = std::panic::catch_unwind(|| {
         let dp = data_ptr as *const c_uchar;
@@ -441,7 +441,7 @@ pub unsafe extern "C" fn rakaly_ck3_file(
 #[no_mangle]
 pub unsafe extern "C" fn rakaly_imperator_file(
     data_ptr: *const c_char,
-    data_len: size_t,
+    data_len: usize,
 ) -> *mut PdsFileResult<'static> {
     let res = std::panic::catch_unwind(|| {
         let dp = data_ptr as *const c_uchar;
@@ -469,7 +469,7 @@ pub unsafe extern "C" fn rakaly_imperator_file(
 #[no_mangle]
 pub unsafe extern "C" fn rakaly_hoi4_file(
     data_ptr: *const c_char,
-    data_len: size_t,
+    data_len: usize,
 ) -> *mut PdsFileResult<'static> {
     let res = std::panic::catch_unwind(|| {
         let dp = data_ptr as *const c_uchar;
@@ -497,7 +497,7 @@ pub unsafe extern "C" fn rakaly_hoi4_file(
 #[no_mangle]
 pub unsafe extern "C" fn rakaly_vic3_file(
     data_ptr: *const c_char,
-    data_len: size_t,
+    data_len: usize,
 ) -> *mut PdsFileResult<'static> {
     let res = std::panic::catch_unwind(|| {
         let dp = data_ptr as *const c_uchar;
@@ -525,7 +525,7 @@ pub unsafe extern "C" fn rakaly_vic3_file(
 #[no_mangle]
 pub unsafe extern "C" fn rakaly_eu5_file(
     data_ptr: *const c_char,
-    data_len: size_t,
+    data_len: usize,
 ) -> *mut PdsFileResult<'static> {
     let res = std::panic::catch_unwind(|| {
         let dp = data_ptr as *const c_uchar;

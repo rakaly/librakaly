@@ -380,7 +380,6 @@ dependencies = [
  "hoi4save",
  "imperator-save",
  "jomini",
- "libc",
  "thiserror",
  "vic3save",
 ]

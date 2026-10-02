@@ -13,7 +13,14 @@ fn main() {
     let crate_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
     let out_path = Path::new(&crate_dir).join("target").join("rakaly.h");
 
+    // Write usize as size_t in the header. This is the same as libc::size_t.
+    let config = cbindgen::Config {
+        usize_is_size_t: true,
+        ..Default::default()
+    };
+
     cbindgen::Builder::new()
+        .with_config(config)
         .with_cpp_compat(true)
         .with_crate(crate_dir)
         .with_language(cbindgen::Language::C)

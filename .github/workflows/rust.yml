@@ -37,7 +37,7 @@ jobs:
       uses: actions/cache@v6
       with:
         path: assets/saves
-        key: assets/saves
+        key: assets/saves-v2
     - name: Build
       run: cargo build --all --verbose --release
     - name: create save assets directory
@@ -46,10 +46,11 @@ jobs:
     - name: Retrieve assets
       shell: bash
       run: |
-        [ ! -f kandy2.bin.eu4 ] && curl -O https://eu4saves-test-cases.s3.us-west-002.backblazeb2.com/kandy2.bin.eu4 || true
-        [ ! -f af_Munso_867_Ironman.ck3 ] && curl -O https://ck3saves-test-cases.s3.us-west-002.backblazeb2.com/af_Munso_867_Ironman.ck3 || true
-        [ ! -f observer1.5.rome ] && curl -O https://imperator-test-cases.s3.us-west-002.backblazeb2.com/observer1.5.rome || true
-        [ ! -f 1.10-ironman.zip ] && curl -O https://hoi4saves-test-cases.s3.us-west-002.backblazeb2.com/1.10-ironman.zip && unzip 1.10-ironman.zip || true
+        [ -f kandy2.bin.eu4 ] || curl -fsSLO https://cdn-dev.pdx.tools/eu4-saves/kandy2.bin.eu4
+        [ -f af_Munso_867_Ironman.ck3 ] || curl -fsSLO https://cdn-dev.pdx.tools/ck3-saves/af_Munso_867_Ironman.ck3
+        [ -f observer1.5.rome ] || curl -fsSLO https://cdn-dev.pdx.tools/imperator-saves/observer1.5.rome
+        [ -f 1.10-ironman.hoi4 ] || curl -fsSLO https://cdn-dev.pdx.tools/hoi4-saves/1.10-ironman.hoi4
+        [ -f ironman-1.0.eu5 ] || curl -fsSLO https://cdn-dev.pdx.tools/eu5-saves/ironman-1.0.eu5
       working-directory: ./assets/saves
     - name: Run verifier
       if: matrix.os == 'ubuntu-22.04'
@@ -64,6 +65,7 @@ jobs:
         LD_LIBRARY_PATH=. ./melter save ../assets/saves/af_Munso_867_Ironman.ck3 > /dev/null
         LD_LIBRARY_PATH=. ./melter save ../assets/saves/observer1.5.rome > /dev/null
         LD_LIBRARY_PATH=. ./melter save ../assets/saves/1.10-ironman.hoi4 > /dev/null
+        LD_LIBRARY_PATH=. ./melter save ../assets/saves/ironman-1.0.eu5 > /dev/null
     - uses: ilammy/msvc-dev-cmd@v1
     - name: Run verifier (windows)
       if: matrix.os == 'windows-latest'
@@ -77,6 +79,7 @@ jobs:
         .\melter.exe save ..\assets\saves\af_Munso_867_Ironman.ck3 > NUL
         .\melter.exe save ..\assets\saves\observer1.5.rome > NUL
         .\melter.exe save ..\assets\saves\1.10-ironman.hoi4 > NUL
+        .\melter.exe save ..\assets\saves\ironman-1.0.eu5 > NUL
     - name: Stage Release
       shell: bash
       run: |

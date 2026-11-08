@@ -1,3 +1,9 @@
+## v0.12.9 - 2026-11-08
+
+- Update to support EU5 1.4.7 saves
+- Update to support HOI4 1.19.4 saves
+- Update to support Vic3 1.15.0 saves
+
 ## v0.12.8 - 2026-10-02
 
 - Update to support EU5 1.3 and 1.4 saves

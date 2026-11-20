@@ -61,7 +61,7 @@ dependencies = [
 [[package]]
 name = "arena-serde"
 version = "0.1.0"
-source = "git+https://github.com/rakaly/jomini#88fc49942c8b3e3b0debe60779ec8d8960dd184e"
+source = "git+https://github.com/rakaly/jomini#3c58f5c6174fb7c001e74e5cbbe330c191f0a7d3"
 dependencies = [
  "arena-serde-derive",
  "bumpalo",
@@ -71,7 +71,7 @@ dependencies = [
 [[package]]
 name = "arena-serde-derive"
 version = "0.1.0"
-source = "git+https://github.com/rakaly/jomini#88fc49942c8b3e3b0debe60779ec8d8960dd184e"
+source = "git+https://github.com/rakaly/jomini#3c58f5c6174fb7c001e74e5cbbe330c191f0a7d3"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -124,7 +124,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 [[package]]
 name = "ck3save"
 version = "0.4.3"
-source = "git+https://github.com/rakaly/jomini#88fc49942c8b3e3b0debe60779ec8d8960dd184e"
+source = "git+https://github.com/rakaly/jomini#3c58f5c6174fb7c001e74e5cbbe330c191f0a7d3"
 dependencies = [
  "jomini",
  "serde",
@@ -207,7 +207,7 @@ dependencies = [
 [[package]]
 name = "eu4save"
 version = "0.8.2"
-source = "git+https://github.com/rakaly/jomini#88fc49942c8b3e3b0debe60779ec8d8960dd184e"
+source = "git+https://github.com/rakaly/jomini#3c58f5c6174fb7c001e74e5cbbe330c191f0a7d3"
 dependencies = [
  "flate2",
  "jomini",
@@ -219,7 +219,7 @@ dependencies = [
 [[package]]
 name = "eu5save"
 version = "0.1.0"
-source = "git+https://github.com/rakaly/jomini#88fc49942c8b3e3b0debe60779ec8d8960dd184e"
+source = "git+https://github.com/rakaly/jomini#3c58f5c6174fb7c001e74e5cbbe330c191f0a7d3"
 dependencies = [
  "arena-serde",
  "bumpalo",
@@ -280,7 +280,7 @@ checksum = "d231dfb89cfffdbc30e7fc41579ed6066ad03abda9e567ccafae602b97ec5024"
 [[package]]
 name = "hoi4save"
 version = "0.4.0"
-source = "git+https://github.com/rakaly/jomini#88fc49942c8b3e3b0debe60779ec8d8960dd184e"
+source = "git+https://github.com/rakaly/jomini#3c58f5c6174fb7c001e74e5cbbe330c191f0a7d3"
 dependencies = [
  "jomini",
  "serde",
@@ -290,7 +290,7 @@ dependencies = [
 [[package]]
 name = "imperator-save"
 version = "0.4.2"
-source = "git+https://github.com/rakaly/jomini#88fc49942c8b3e3b0debe60779ec8d8960dd184e"
+source = "git+https://github.com/rakaly/jomini#3c58f5c6174fb7c001e74e5cbbe330c191f0a7d3"
 dependencies = [
  "jomini",
  "serde",
@@ -321,9 +321,9 @@ checksum = "4a5f13b858c8d314ee3e8f639011f7ccefe71f97f96e50151fb991f267928e2c"
 
 [[package]]
 name = "jomini"
-version = "0.37.1"
+version = "0.38.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ab6b0735f2ab0de85c7927c1d579b1f9b904cdf0279f6280f4253a98527c3cd4"
+checksum = "5f871f2204fb8dfc02da4e5d4823f06aff062cfba7b8f5d079c98dee956ea9a0"
 dependencies = [
  "flate2",
  "itoa",
@@ -744,7 +744,7 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 [[package]]
 name = "vic3save"
 version = "0.1.0"
-source = "git+https://github.com/rakaly/jomini#88fc49942c8b3e3b0debe60779ec8d8960dd184e"
+source = "git+https://github.com/rakaly/jomini#3c58f5c6174fb7c001e74e5cbbe330c191f0a7d3"
 dependencies = [
  "getrandom",
  "jomini",

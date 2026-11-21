@@ -1,3 +1,7 @@
+## v0.12.10 - 2026-11-21
+
+- Update to support CK3 1.21 saves
+
 ## v0.12.9 - 2026-11-08
 
 - Update to support EU5 1.4.7 saves
